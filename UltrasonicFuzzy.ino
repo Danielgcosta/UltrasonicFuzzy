@@ -14,49 +14,49 @@ uSensor ultrasonicArray[3] = { ultrasonic1 , ultrasonic2, ultrasonic3 };
 
 // Class variables
 // Left Sensor
-float _veryNearLeftSensorMembership;
-float _nearLeftSensorMembership;
-float _farLeftSensorMembership;
-float _veryFarLeftSensorMembership;
+float _veryNearLeftSensorMembership = 0;
+float _nearLeftSensorMembership = 0;
+float _farLeftSensorMembership = 0;
+float _veryFarLeftSensorMembership = 0;
 
 // Front Sensor
-float _veryNearFrontSensorMembership;
-float _nearFrontSensorMembership;
-float _farFrontSensorMembership;
-float _veryFarFrontSensorMembership;
+float _veryNearFrontSensorMembership = 0;
+float _nearFrontSensorMembership = 0;
+float _farFrontSensorMembership = 0;
+float _veryFarFrontSensorMembership = 0;
 
 // Right Sensor
-float _veryNearRightSensorMembership;
-float _nearRightSensorMembership;
-float _farRightSensorMembership;
-float _veryFarRightSensorMembership;
+float _veryNearRightSensorMembership = 0;
+float _nearRightSensorMembership = 0;
+float _farRightSensorMembership = 0;
+float _veryFarRightSensorMembership = 0;
 
 // Distance to Goal
-float _veryNearGoalMembership;
-float _nearGoalMembership;
-float _farGoalMembership;
-float _veryFarGoalMembership;
+float _veryNearGoalMembership = 0;
+float _nearGoalMembership = 0;
+float _farGoalMembership = 0;
+float _veryFarGoalMembership = 0;
 
 // Angle between Robot and Goal
-float _veryNegativeAngleMembership;
-float _negativeAngleMembership;
-float _zeroAngleMembership;
-float _positiveAngleMembership;
-float _veryPositiveAngleMembership;
+float _veryNegativeAngleMembership = 0;
+float _negativeAngleMembership = 0;
+float _zeroAngleMembership = 0;
+float _positiveAngleMembership = 0;
+float _veryPositiveAngleMembership = 0;
 
 // Left Motor Power
-float _veryNegativeLeftPowerMembership;
-float _negativeLeftPowerMembership;
-float _zeroLeftPowerMembership;
-float _positiveLeftPowerMembership;
-float _veryPositiveLeftPowerMembership;
+float _veryNegativeLeftPowerMembership = 0;
+float _negativeLeftPowerMembership = 0;
+float _zeroLeftPowerMembership = 0;
+float _positiveLeftPowerMembership = 0;
+float _veryPositiveLeftPowerMembership = 0;
 
 // Right Motor Power
-float _veryNegativeRightPowerMembership;
-float _negativeRightPowerMembership;
-float _zeroRightPowerMembership;
-float _positiveRightPowerMembership;
-float _veryPositiveRightPowerMembership;
+float _veryNegativeRightPowerMembership = 0;
+float _negativeRightPowerMembership = 0;
+float _zeroRightPowerMembership = 0;
+float _positiveRightPowerMembership = 0;
+float _veryPositiveRightPowerMembership = 0;
 
 void setup()
 {
@@ -97,13 +97,13 @@ void loop()
 	
 
 	// Sensor reading
-	float leftSensorValue = 0; // Substituir pela entrada do sensor
-	float frontSensorValue = 0; // Substituir pela entrada do sensor
-	float rightSensorValue = 0; // Substituir pela entrada do sensor
-	float distanceToGoal = 0; // Substituir pela entrada do GPS
+	float leftSensorValue = 10; // Substituir pela entrada do sensor
+	float frontSensorValue = 10; // Substituir pela entrada do sensor
+	float rightSensorValue = 10; // Substituir pela entrada do sensor
+	float distanceToGoal = 1; // Substituir pela entrada do GPS
 	float angleToGoal = 0; // Substituir pela entrada do GPS
 
-
+	
 	// Fuzzification
 	// Left Sensor
 	float _veryNearLeftSensorMembership = VeryNearSensorSet(leftSensorValue);
@@ -667,8 +667,8 @@ float LeftMotorNegative() {
 	// (Left far)	   and (Front very near) and (Angle zero)
 	// (Left far)	   and (Angle very positive)
 	leftMotor[0] = min(_nearLeftSensorMembership, _nearFrontSensorMembership);
-	leftMotor[1] = min(_veryFarLeftSensorMembership, _veryNearFrontSensorMembership, _zeroAngleMembership);
-	leftMotor[2] = min(_farLeftSensorMembership, _veryNearFrontSensorMembership, _zeroAngleMembership);
+	leftMotor[1] = min(_veryFarLeftSensorMembership, min(_veryNearFrontSensorMembership, _zeroAngleMembership));
+	leftMotor[2] = min(_farLeftSensorMembership, min(_veryNearFrontSensorMembership, _zeroAngleMembership));
 	leftMotor[3] = min(_farLeftSensorMembership, _veryPositiveAngleMembership);
 	for (unsigned int i = 0; i < 4; i++) {
 		maximum = max(maximum, leftMotor[i]);
@@ -688,8 +688,8 @@ float LeftMotorPositive() {
 	// (Angle positive) and (Left very far)
 	// (Angle positive) and (Left far)
 	// (Front near) and (Left near)
-	leftMotor[0] = min(_nearFrontSensorMembership, _zeroAngleMembership, _veryFarLeftSensorMembership);
-	leftMotor[1] = min(_nearFrontSensorMembership, _zeroAngleMembership, _farLeftSensorMembership);
+	leftMotor[0] = min(_nearFrontSensorMembership, min(_zeroAngleMembership, _veryFarLeftSensorMembership));
+	leftMotor[1] = min(_nearFrontSensorMembership, min(_zeroAngleMembership, _farLeftSensorMembership));
 	leftMotor[2] = min(_veryFarLeftSensorMembership, _positiveAngleMembership);
 	leftMotor[3] = min(_farLeftSensorMembership, _positiveAngleMembership);
 	leftMotor[4] = min(_nearFrontSensorMembership, _nearLeftSensorMembership);
@@ -716,14 +716,14 @@ float LeftMotorVeryPositive() {
 	// (Front very near) and (Left very near)
 	// (Front very near) and (Left near)
 	// (Front near)		 and (Left very near)
-	leftMotor[0] = min(_veryFarFrontSensorMembership, _zeroAngleMembership, _veryFarGoalMembership);
-	leftMotor[1] = min(_farFrontSensorMembership, _zeroAngleMembership, _veryFarGoalMembership);
-	leftMotor[2] = min(_veryFarFrontSensorMembership, _zeroAngleMembership, _farGoalMembership);
-	leftMotor[3] = min(_farFrontSensorMembership, _zeroAngleMembership, _farGoalMembership);
-	leftMotor[4] = min(_nearFrontSensorMembership, _zeroAngleMembership, _nearLeftSensorMembership);
-	leftMotor[5] = min(_nearFrontSensorMembership, _zeroAngleMembership, _veryNearLeftSensorMembership);
-	leftMotor[6] = min(_veryNearFrontSensorMembership, _zeroAngleMembership, _nearLeftSensorMembership);
-	leftMotor[7] = min(_veryNearFrontSensorMembership, _zeroAngleMembership, _veryNearLeftSensorMembership);
+	leftMotor[0] = min(_veryFarFrontSensorMembership, min(_zeroAngleMembership, _veryFarGoalMembership));
+	leftMotor[1] = min(_farFrontSensorMembership, min(_zeroAngleMembership, _veryFarGoalMembership));
+	leftMotor[2] = min(_veryFarFrontSensorMembership, min(_zeroAngleMembership, _farGoalMembership));
+	leftMotor[3] = min(_farFrontSensorMembership, min(_zeroAngleMembership, _farGoalMembership));
+	leftMotor[4] = min(_nearFrontSensorMembership, min(_zeroAngleMembership, _nearLeftSensorMembership));
+	leftMotor[5] = min(_nearFrontSensorMembership, min(_zeroAngleMembership, _veryNearLeftSensorMembership));
+	leftMotor[6] = min(_veryNearFrontSensorMembership, min(_zeroAngleMembership, _nearLeftSensorMembership));
+	leftMotor[7] = min(_veryNearFrontSensorMembership, min(_veryNearLeftSensorMembership, _zeroAngleMembership));
 	leftMotor[8] = min(_negativeAngleMembership, _veryFarRightSensorMembership);
 	leftMotor[9] = min(_negativeAngleMembership, _farRightSensorMembership);
 	leftMotor[10] = min(_veryNegativeAngleMembership, _veryFarRightSensorMembership);
@@ -747,7 +747,7 @@ float RightMotorVeryNegative() {
 	rightMotor[0] = min(_veryNearRightSensorMembership, _veryNearRightSensorMembership);
 	rightMotor[1] = min(_nearRightSensorMembership, _veryNearRightSensorMembership);
 	rightMotor[2] = min(_veryNearRightSensorMembership, _nearRightSensorMembership);
-	rightMotor[3] = min(_veryNearLeftSensorMembership, +_veryNearFrontSensorMembership, _zeroAngleMembership);
+	rightMotor[3] = min(_veryNearLeftSensorMembership, min(_veryNearFrontSensorMembership, _zeroAngleMembership));
 	rightMotor[4] = min(_veryFarRightSensorMembership, _veryNegativeAngleMembership);
 	for (unsigned int i = 0; i < 5; i++) {
 		maximum = max(maximum, rightMotor[i]);
@@ -762,8 +762,8 @@ float RightMotorNegative() {
 	// (Left very near) and (Front near) and (Angle zero)
 	// (Right far) and (Angle very negative)
 	rightMotor[0] = min(_nearLeftSensorMembership, _nearFrontSensorMembership);
-	rightMotor[1] = min(_nearLeftSensorMembership, _veryNearFrontSensorMembership, _zeroAngleMembership);
-	rightMotor[2] = min(_veryNearLeftSensorMembership, _nearFrontSensorMembership, _zeroAngleMembership);
+	rightMotor[1] = min(_nearLeftSensorMembership, min(_veryNearFrontSensorMembership, _zeroAngleMembership));
+	rightMotor[2] = min(_veryNearLeftSensorMembership, min(_nearFrontSensorMembership, _zeroAngleMembership));
 	rightMotor[3] = min(_farRightSensorMembership, _veryNegativeAngleMembership);
 	for (unsigned int i = 0; i < 4; i++) {
 		maximum = max(maximum, rightMotor[i]);
@@ -782,7 +782,7 @@ float RightMotorPositive() {
 	// (Right very far) and (Angle negative)
 	// (Right far) and (Angle negative)
 	// (Right near) and (Front near)
-	rightMotor[0] = min(_nearFrontSensorMembership, _zeroAngleMembership, _nearLeftSensorMembership);
+	rightMotor[0] = min(_nearFrontSensorMembership, min(_zeroAngleMembership, _nearLeftSensorMembership));
 	rightMotor[1] = min(_veryFarRightSensorMembership, _negativeAngleMembership);
 	rightMotor[2] = min(_farRightSensorMembership, _negativeAngleMembership);
 	rightMotor[3] = min(_nearRightSensorMembership, _nearFrontSensorMembership);
@@ -809,14 +809,14 @@ float RightMotorVeryPositive() {
 	// (Front very near) and (Right very near)
 	// (Front very near) and (Right near)
 	// (Front near)		 and (Right very near)
-	rightMotor[0] = min(_veryFarFrontSensorMembership, _zeroAngleMembership, _veryFarGoalMembership);
-	rightMotor[1] = min(_farFrontSensorMembership, _zeroAngleMembership, _veryFarGoalMembership);
-	rightMotor[2] = min(_veryFarFrontSensorMembership, _zeroAngleMembership, _farGoalMembership);
-	rightMotor[3] = min(_farFrontSensorMembership, _zeroAngleMembership, _farGoalMembership);
-	rightMotor[4] = min(_nearFrontSensorMembership, _zeroAngleMembership, _veryFarGoalMembership);
-	rightMotor[5] = min(_nearFrontSensorMembership, _zeroAngleMembership, _farGoalMembership);
-	rightMotor[6] = min(_veryNearFrontSensorMembership, _zeroAngleMembership, _veryFarLeftSensorMembership);
-	rightMotor[7] = min(_veryNearFrontSensorMembership, _zeroAngleMembership, _farLeftSensorMembership);
+	rightMotor[0] = min(_veryFarFrontSensorMembership, min(_zeroAngleMembership, _veryFarGoalMembership));
+	rightMotor[1] = min(_farFrontSensorMembership, min(_zeroAngleMembership, _veryFarGoalMembership));
+	rightMotor[2] = min(_veryFarFrontSensorMembership, min(_zeroAngleMembership, _farGoalMembership));
+	rightMotor[3] = min(_farFrontSensorMembership, min(_zeroAngleMembership, _farGoalMembership));
+	rightMotor[4] = min(_nearFrontSensorMembership, min(_zeroAngleMembership, _veryFarGoalMembership));
+	rightMotor[5] = min(_nearFrontSensorMembership, min(_zeroAngleMembership, _farGoalMembership));
+	rightMotor[6] = min(_veryNearFrontSensorMembership, min(_zeroAngleMembership, _veryFarLeftSensorMembership));
+	rightMotor[7] = min(_veryNearFrontSensorMembership, min(_zeroAngleMembership, _farLeftSensorMembership));
 	rightMotor[8] = min(_veryFarLeftSensorMembership, _positiveAngleMembership);
 	rightMotor[9] = min(_veryFarLeftSensorMembership, _veryPositiveAngleMembership);
 	rightMotor[10] = min(_farLeftSensorMembership, _positiveAngleMembership);
