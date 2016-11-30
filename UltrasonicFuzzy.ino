@@ -63,3 +63,79 @@ double evaluateSensor(struct uSensor sensor)
 	unsigned long pulse = pulseIn(sensor.dataPort, HIGH);
 	return pulse / 58.;
 }
+
+// FUZZY LOGIC SET INFORMATION
+
+// Support and core values 
+const float VERY_CLOSE_SENSOR_SET_CORE = 0.5;
+const float VERY_CLOSE_SENSOR_SET_SUPPORT = 1;
+
+const float CLOSE_SENSOR_SET_SUPPORT_1 = 0.5;
+const float CLOSE_SENSOR_SET_CORE_1 = 1;
+const float CLOSE_SENSOR_SET_CORE_2 = 2;
+const float CLOSE_SENSOR_SET_SUPPORT_2 = 2.5;
+
+const float FAR_SENSOR_SET_SUPPORT_1 = 2;
+const float FAR_SENSOR_SET_CORE_1 = 2.5;
+const float FAR_SENSOR_SET_CORE_2 = 3;
+const float FAR_SENSOR_SET_SUPPORT_2 = 3.5;
+
+const float VERY_FAR_SENSOR_SET_SUPPORT = 3;
+const float VERY_FAR_SENSOR_SET_CORE = 3.5;
+
+// Membership calculations
+float VeryCloseSensorSet(float value) {
+	float membership = 0;
+	if (value <= VERY_CLOSE_SENSOR_SET_CORE) {
+		membership = 1;
+	}
+	else if (value < VERY_CLOSE_SENSOR_SET_SUPPORT) {
+		membership = (value - VERY_CLOSE_SENSOR_SET_SUPPORT) 
+			/ (VERY_CLOSE_SENSOR_SET_CORE - VERY_CLOSE_SENSOR_SET_SUPPORT);
+	}
+	return membership;
+}
+
+float CloseSensorSet(float value) {
+	float membership = 0;
+	if (value > CLOSE_SENSOR_SET_SUPPORT_1 && value < CLOSE_SENSOR_SET_CORE_1) {
+		membership = (value - CLOSE_SENSOR_SET_SUPPORT_1)
+			/ (CLOSE_SENSOR_SET_CORE_1 - CLOSE_SENSOR_SET_SUPPORT_1);
+	}
+	else if (value >= CLOSE_SENSOR_SET_CORE_1 && value <= CLOSE_SENSOR_SET_CORE_2) {
+		membership = 1;
+	}
+	else if (value > CLOSE_SENSOR_SET_CORE_2 && value < CLOSE_SENSOR_SET_SUPPORT_2) {
+		membership = (value - CLOSE_SENSOR_SET_SUPPORT_2)
+			/ (CLOSE_SENSOR_SET_CORE_2 - CLOSE_SENSOR_SET_SUPPORT_2);
+	}
+	return membership;
+}
+
+float FarSensorSet(float value) {
+	float membership = 0;
+	if (value > FAR_SENSOR_SET_SUPPORT_1 && value < FAR_SENSOR_SET_CORE_1) {
+		membership = (value - FAR_SENSOR_SET_SUPPORT_1)
+			/ (FAR_SENSOR_SET_CORE_1 - FAR_SENSOR_SET_SUPPORT_1);
+	}
+	else if (value >= FAR_SENSOR_SET_CORE_1 && value <= FAR_SENSOR_SET_CORE_2) {
+		membership = 1;
+	}
+	else if (value > FAR_SENSOR_SET_CORE_2 && value < FAR_SENSOR_SET_SUPPORT_2) {
+		membership = (value - FAR_SENSOR_SET_SUPPORT_2)
+			/ (FAR_SENSOR_SET_CORE_2 - FAR_SENSOR_SET_SUPPORT_2);
+	}
+	return membership;
+}
+
+float VeryFarSensorSet(float value) {
+	float membership = 0;
+	if (value > VERY_FAR_SENSOR_SET_SUPPORT) {
+		membership = (value - VERY_FAR_SENSOR_SET_SUPPORT)
+			/ (VERY_FAR_SENSOR_SET_CORE - VERY_FAR_SENSOR_SET_SUPPORT);
+	}
+	else if (value >= VERY_FAR_SENSOR_SET_CORE) {
+		membership = 1;
+	}
+	return membership;
+}
