@@ -24,6 +24,7 @@ void setup()
 
 void loop()
 {
+	/*
 	Serial.println("Rodando.");
 	double readings[3][NUMBER_OF_READINGS];
 	double sum[3] = { 0,0,0 };
@@ -46,6 +47,9 @@ void loop()
 		Serial.print("   ");
 	}
 	delay(5000);
+	*/
+	
+	GoalFuzzyTest();
 }
 
 double evaluateSensor(struct uSensor sensor)
@@ -131,14 +135,39 @@ float FarSensorSet(float value) {
 
 float VeryFarSensorSet(float value) {
 	float membership = 0;
-	if (value > VERY_FAR_SENSOR_SET_SUPPORT) {
+	if (value >= VERY_FAR_SENSOR_SET_CORE){
+		membership = 1;
+	}
+	else if (value > VERY_FAR_SENSOR_SET_SUPPORT) {
 		membership = (value - VERY_FAR_SENSOR_SET_SUPPORT)
 			/ (VERY_FAR_SENSOR_SET_CORE - VERY_FAR_SENSOR_SET_SUPPORT);
 	}
-	else if (value >= VERY_FAR_SENSOR_SET_CORE) {
-		membership = 1;
-	}
 	return membership;
+}
+
+void SensorFuzzyTest() {
+	float m1 = 0;
+	float m2 = 0;
+	float m3 = 0;
+	float m4 = 0;
+	float value = 0;
+	Serial.println("Fuzzy output: ");
+	for (int i = 0; i < 50; i++) {
+		value = i / 10.;
+		m1 = VeryCloseSensorSet(value);
+		m2 = CloseSensorSet(value);
+		m3 = FarSensorSet(value);
+		m4 = VeryFarSensorSet(value);
+		Serial.print("MP=");
+		Serial.print(m1);
+		Serial.print("; P=");
+		Serial.print(m2);
+		Serial.print("; L=");
+		Serial.print(m3);
+		Serial.print("; ML=");
+		Serial.println(m4);
+	}
+	delay(1000);
 }
 
 // Distance to goal
@@ -204,12 +233,39 @@ float FarGoalSet(float value) {
 
 float VeryFarGoalSet(float value) {
 	float membership = 0;
-	if (value > VERY_FAR_GOAL_SUPPORT) {
+	if (value >= VERY_FAR_GOAL_CORE) {
+		membership = 1;
+	}
+	else if (value > VERY_FAR_GOAL_SUPPORT) {
 		membership = (value - VERY_FAR_GOAL_SUPPORT)
 			/ (VERY_FAR_GOAL_CORE - VERY_FAR_GOAL_SUPPORT);
 	}
-	else if (value >= VERY_FAR_GOAL_CORE) {
-		membership = 1;
-	}
 	return membership;
 }
+
+void GoalFuzzyTest() {
+	float m1 = 0;
+	float m2 = 0;
+	float m3 = 0;
+	float m4 = 0;
+	float value = 0;
+	Serial.println("Fuzzy output: ");
+	for (int i = 0; i < 50; i++) {
+		value = i / 50.;
+		m1 = VeryCloseGoalSet(value);
+		m2 = CloseGoalSet(value);
+		m3 = FarGoalSet(value);
+		m4 = VeryFarGoalSet(value);
+		Serial.print("MP=");
+		Serial.print(m1);
+		Serial.print("; P=");
+		Serial.print(m2);
+		Serial.print("; L=");
+		Serial.print(m3);
+		Serial.print("; ML=");
+		Serial.println(m4);
+	}
+	delay(1000);
+}
+
+// Angle between object
