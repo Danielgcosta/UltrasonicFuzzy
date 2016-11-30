@@ -49,7 +49,7 @@ void loop()
 	delay(5000);
 	*/
 	
-	AngleFuzzyTest();
+	PowerFuzzyTest();
 }
 
 double evaluateSensor(struct uSensor sensor)
@@ -380,12 +380,144 @@ void AngleFuzzyTest() {
 	float value = 0;
 	Serial.println("Fuzzy output: ");
 	for (int i = 0; i < 63; i++) {
-		value = (i-32)/10.;
+		value = (i - 32) / 10.;
 		m1 = VeryNegativeAngleSet(value);
 		m2 = NegativeAngleSet(value);
 		m3 = ZeroAngleSet(value);
 		m4 = PositiveAngleSet(value);
 		m5 = VeryPositiveAngleSet(value);
+		Serial.print("MN=");
+		Serial.print(m1);
+		Serial.print("; N=");
+		Serial.print(m2);
+		Serial.print("; Z=");
+		Serial.print(m3);
+		Serial.print("; P=");
+		Serial.print(m4);
+		Serial.print("; MP=");
+		Serial.println(m5);
+	}
+	delay(1000);
+}
+
+// Motor Power
+// Support and core values 
+const float VERY_NEGATIVE_POWER_SUPPORT_1 = -1;
+const float VERY_NEGATIVE_POWER_CORE = -0.8;
+const float VERY_NEGATIVE_POWER_SUPPORT_2 = -0.4;
+
+const float NEGATIVE_POWER_SUPPORT_1 = -0.6;
+const float NEGATIVE_POWER_CORE = -0.4;
+const float NEGATIVE_POWER_SUPPORT_2 = -0.1;
+
+const float ZERO_POWER_SUPPORT_1 = -0.2;
+const float ZERO_POWER_CORE = 0;
+const float ZERO_POWER_SUPPORT_2 = 0.2;
+
+const float POSITIVE_POWER_SUPPORT_1 = 0.1;
+const float POSITIVE_POWER_CORE = 0.4;
+const float POSITIVE_POWER_SUPPORT_2 = 0.6;
+
+const float VERY_POSITIVE_POWER_SUPPORT_1 = 0.4;
+const float VERY_POSITIVE_POWER_CORE = 0.8;
+const float VERY_POSITIVE_POWER_SUPPORT_2 = 1;
+
+// Membership calculation
+float VeryNegativePowerSet(float value) {
+	float membership = 0;
+	if (value > VERY_NEGATIVE_POWER_SUPPORT_1 && value < VERY_NEGATIVE_POWER_CORE) {
+		membership = (value - VERY_NEGATIVE_POWER_SUPPORT_1)
+			/ (VERY_NEGATIVE_POWER_CORE - VERY_NEGATIVE_POWER_SUPPORT_1);
+	}
+	else if (value == VERY_NEGATIVE_POWER_CORE) {
+		membership = 1;
+	}
+	else if (value > VERY_NEGATIVE_POWER_CORE && value < VERY_NEGATIVE_POWER_SUPPORT_2) {
+		membership = (value - VERY_NEGATIVE_POWER_SUPPORT_2)
+			/ (VERY_NEGATIVE_POWER_CORE - VERY_NEGATIVE_POWER_SUPPORT_2);
+	}
+	return membership;
+}
+
+float NegativePowerSet(float value) {
+	float membership = 0;
+	if (value > NEGATIVE_POWER_SUPPORT_1 && value < NEGATIVE_POWER_CORE) {
+		membership = (value - NEGATIVE_POWER_SUPPORT_1)
+			/ (NEGATIVE_POWER_CORE - NEGATIVE_POWER_SUPPORT_1);
+	}
+	else if (value == NEGATIVE_POWER_CORE) {
+		membership = 1;
+	}
+	else if (value > NEGATIVE_POWER_CORE && value < NEGATIVE_POWER_SUPPORT_2) {
+		membership = (value - NEGATIVE_POWER_SUPPORT_2)
+			/ (NEGATIVE_POWER_CORE - NEGATIVE_POWER_SUPPORT_2);
+	}
+	return membership;
+}
+
+float ZeroPowerSet(float value) {
+	float membership = 0;
+	if (value > ZERO_POWER_SUPPORT_1 && value < ZERO_POWER_CORE) {
+		membership = (value - ZERO_POWER_SUPPORT_1)
+			/ (ZERO_POWER_CORE - ZERO_POWER_SUPPORT_1);
+	}
+	else if (value == ZERO_POWER_CORE) {
+		membership = 1;
+	}
+	else if (value > ZERO_POWER_CORE && value < ZERO_POWER_SUPPORT_2) {
+		membership = (value - ZERO_POWER_SUPPORT_2)
+			/ (ZERO_POWER_CORE - ZERO_POWER_SUPPORT_2);
+	}
+	return membership;
+}
+
+float PositivePowerSet(float value) {
+	float membership = 0;
+	if (value > POSITIVE_POWER_SUPPORT_1 && value < POSITIVE_POWER_CORE) {
+		membership = (value - POSITIVE_POWER_SUPPORT_1)
+			/ (POSITIVE_POWER_CORE - POSITIVE_POWER_SUPPORT_1);
+	}
+	else if (value == POSITIVE_POWER_CORE) {
+		membership = 1;
+	}
+	else if (value > POSITIVE_POWER_CORE && value < POSITIVE_POWER_SUPPORT_2) {
+		membership = (value - POSITIVE_POWER_SUPPORT_2)
+			/ (POSITIVE_POWER_CORE - POSITIVE_POWER_SUPPORT_2);
+	}
+	return membership;
+}
+
+float VeryPositivePowerSet(float value) {
+	float membership = 0;
+	if (value > VERY_POSITIVE_POWER_SUPPORT_1 && value < VERY_POSITIVE_POWER_CORE) {
+		membership = (value - VERY_POSITIVE_POWER_SUPPORT_1)
+			/ (VERY_POSITIVE_POWER_CORE - VERY_POSITIVE_POWER_SUPPORT_1);
+	}
+	else if (value == VERY_POSITIVE_POWER_CORE) {
+		membership = 1;
+	}
+	else if (value > VERY_POSITIVE_POWER_CORE && value < VERY_POSITIVE_POWER_SUPPORT_2) {
+		membership = (value - VERY_POSITIVE_POWER_SUPPORT_2)
+			/ (VERY_POSITIVE_POWER_CORE - VERY_POSITIVE_POWER_SUPPORT_2);
+	}
+	return membership;
+}
+
+void PowerFuzzyTest() {
+	float m1 = 0;
+	float m2 = 0;
+	float m3 = 0;
+	float m4 = 0;
+	float m5 = 0;
+	float value = 0;
+	Serial.println("Fuzzy output: ");
+	for (int i = 0; i < 50; i++) {
+		value = (i - 25) / 25.;
+		m1 = VeryNegativePowerSet(value);
+		m2 = NegativePowerSet(value);
+		m3 = ZeroPowerSet(value);
+		m4 = PositivePowerSet(value);
+		m5 = VeryPositivePowerSet(value);
 		Serial.print("MN=");
 		Serial.print(m1);
 		Serial.print("; N=");
