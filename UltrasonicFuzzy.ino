@@ -49,7 +49,7 @@ void loop()
 	delay(5000);
 	*/
 	
-	GoalFuzzyTest();
+	AngleFuzzyTest();
 }
 
 double evaluateSensor(struct uSensor sensor)
@@ -268,4 +268,134 @@ void GoalFuzzyTest() {
 	delay(1000);
 }
 
-// Angle between object
+// Angle to objective
+// Support and core values 
+const float VERY_NEGATIVE_ANGLE_SUPPORT_1 = -3.14;
+const float VERY_NEGATIVE_ANGLE_CORE = -2.4;
+const float VERY_NEGATIVE_ANGLE_SUPPORT_2 = -1.5;
+
+const float NEGATIVE_ANGLE_SUPPORT_1 = -2.4;
+const float NEGATIVE_ANGLE_CORE = -1.5;
+const float NEGATIVE_ANGLE_SUPPORT_2 = -0.4;
+
+const float ZERO_ANGLE_SUPPORT_1 = -0.9;
+const float ZERO_ANGLE_CORE = 0;
+const float ZERO_ANGLE_SUPPORT_2 = 0.9;
+
+const float POSITIVE_ANGLE_SUPPORT_1 = 0.4;
+const float POSITIVE_ANGLE_CORE = 1.5;
+const float POSITIVE_ANGLE_SUPPORT_2 = 2.4;
+
+const float VERY_POSITIVE_ANGLE_SUPPORT_1 = 1.5;
+const float VERY_POSITIVE_ANGLE_CORE = 2.4;
+const float VERY_POSITIVE_ANGLE_SUPPORT_2 = 3.14;
+
+// Membership calculation
+float VeryNegativeAngleSet(float value) {
+	float membership = 0;
+	if (value > VERY_NEGATIVE_ANGLE_SUPPORT_1 && value < VERY_NEGATIVE_ANGLE_CORE) {
+		membership = (value - VERY_NEGATIVE_ANGLE_SUPPORT_1)
+			/ (VERY_NEGATIVE_ANGLE_CORE - VERY_NEGATIVE_ANGLE_SUPPORT_1);
+	}
+	else if (value == VERY_NEGATIVE_ANGLE_CORE) {
+		membership = 1;
+	}
+	else if (value > VERY_NEGATIVE_ANGLE_CORE && value < VERY_NEGATIVE_ANGLE_SUPPORT_2) {
+		membership = (value - VERY_NEGATIVE_ANGLE_SUPPORT_2)
+			/ (VERY_NEGATIVE_ANGLE_CORE - VERY_NEGATIVE_ANGLE_SUPPORT_2);
+	}
+	return membership;
+}
+
+float NegativeAngleSet(float value) {
+	float membership = 0;
+	if (value > NEGATIVE_ANGLE_SUPPORT_1 && value < NEGATIVE_ANGLE_CORE) {
+		membership = (value - NEGATIVE_ANGLE_SUPPORT_1)
+			/ (NEGATIVE_ANGLE_CORE - NEGATIVE_ANGLE_SUPPORT_1);
+	}
+	else if (value == NEGATIVE_ANGLE_CORE) {
+		membership = 1;
+	}
+	else if (value > NEGATIVE_ANGLE_CORE && value < NEGATIVE_ANGLE_SUPPORT_2) {
+		membership = (value - NEGATIVE_ANGLE_SUPPORT_2)
+			/ (NEGATIVE_ANGLE_CORE - NEGATIVE_ANGLE_SUPPORT_2);
+	}
+	return membership;
+}
+
+float ZeroAngleSet(float value) {
+	float membership = 0;
+	if (value > ZERO_ANGLE_SUPPORT_1 && value < ZERO_ANGLE_CORE) {
+		membership = (value - ZERO_ANGLE_SUPPORT_1)
+			/ (ZERO_ANGLE_CORE - ZERO_ANGLE_SUPPORT_1);
+	}
+	else if (value == ZERO_ANGLE_CORE) {
+		membership = 1;
+	}
+	else if (value > ZERO_ANGLE_CORE && value < ZERO_ANGLE_SUPPORT_2) {
+		membership = (value - ZERO_ANGLE_SUPPORT_2)
+			/ (ZERO_ANGLE_CORE - ZERO_ANGLE_SUPPORT_2);
+	}
+	return membership;
+}
+
+float PositiveAngleSet(float value) {
+	float membership = 0;
+	if (value > POSITIVE_ANGLE_SUPPORT_1 && value < POSITIVE_ANGLE_CORE) {
+		membership = (value - POSITIVE_ANGLE_SUPPORT_1)
+			/ (POSITIVE_ANGLE_CORE - POSITIVE_ANGLE_SUPPORT_1);
+	}
+	else if (value == POSITIVE_ANGLE_CORE) {
+		membership = 1;
+	}
+	else if (value > POSITIVE_ANGLE_CORE && value < POSITIVE_ANGLE_SUPPORT_2) {
+		membership = (value - POSITIVE_ANGLE_SUPPORT_2)
+			/ (POSITIVE_ANGLE_CORE - POSITIVE_ANGLE_SUPPORT_2);
+	}
+	return membership;
+}
+
+float VeryPositiveAngleSet(float value) {
+	float membership = 0;
+	if (value > VERY_POSITIVE_ANGLE_SUPPORT_1 && value < VERY_POSITIVE_ANGLE_CORE) {
+		membership = (value - VERY_POSITIVE_ANGLE_SUPPORT_1)
+			/ (VERY_POSITIVE_ANGLE_CORE - VERY_POSITIVE_ANGLE_SUPPORT_1);
+	}
+	else if (value == VERY_POSITIVE_ANGLE_CORE) {
+		membership = 1;
+	}
+	else if (value > VERY_POSITIVE_ANGLE_CORE && value < VERY_POSITIVE_ANGLE_SUPPORT_2) {
+		membership = (value - VERY_POSITIVE_ANGLE_SUPPORT_2)
+			/ (VERY_POSITIVE_ANGLE_CORE - VERY_POSITIVE_ANGLE_SUPPORT_2);
+	}
+	return membership;
+}
+
+void AngleFuzzyTest() {
+	float m1 = 0;
+	float m2 = 0;
+	float m3 = 0;
+	float m4 = 0;
+	float m5 = 0;
+	float value = 0;
+	Serial.println("Fuzzy output: ");
+	for (int i = 0; i < 63; i++) {
+		value = (i-32)/10.;
+		m1 = VeryNegativeAngleSet(value);
+		m2 = NegativeAngleSet(value);
+		m3 = ZeroAngleSet(value);
+		m4 = PositiveAngleSet(value);
+		m5 = VeryPositiveAngleSet(value);
+		Serial.print("MN=");
+		Serial.print(m1);
+		Serial.print("; N=");
+		Serial.print(m2);
+		Serial.print("; Z=");
+		Serial.print(m3);
+		Serial.print("; P=");
+		Serial.print(m4);
+		Serial.print("; MP=");
+		Serial.println(m5);
+	}
+	delay(1000);
+}
