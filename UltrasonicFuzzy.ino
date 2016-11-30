@@ -64,8 +64,9 @@ double evaluateSensor(struct uSensor sensor)
 	return pulse / 58.;
 }
 
-// FUZZY LOGIC SET INFORMATION
+/* FUZZY LOGIC SET INFORMATION */
 
+// Ultrassonic Sensors
 // Support and core values 
 const float VERY_CLOSE_SENSOR_SET_CORE = 0.5;
 const float VERY_CLOSE_SENSOR_SET_SUPPORT = 1;
@@ -83,14 +84,14 @@ const float FAR_SENSOR_SET_SUPPORT_2 = 3.5;
 const float VERY_FAR_SENSOR_SET_SUPPORT = 3;
 const float VERY_FAR_SENSOR_SET_CORE = 3.5;
 
-// Membership calculations
+// Membership calculation
 float VeryCloseSensorSet(float value) {
 	float membership = 0;
 	if (value <= VERY_CLOSE_SENSOR_SET_CORE) {
 		membership = 1;
 	}
 	else if (value < VERY_CLOSE_SENSOR_SET_SUPPORT) {
-		membership = (value - VERY_CLOSE_SENSOR_SET_SUPPORT) 
+		membership = (value - VERY_CLOSE_SENSOR_SET_SUPPORT)
 			/ (VERY_CLOSE_SENSOR_SET_CORE - VERY_CLOSE_SENSOR_SET_SUPPORT);
 	}
 	return membership;
@@ -135,6 +136,79 @@ float VeryFarSensorSet(float value) {
 			/ (VERY_FAR_SENSOR_SET_CORE - VERY_FAR_SENSOR_SET_SUPPORT);
 	}
 	else if (value >= VERY_FAR_SENSOR_SET_CORE) {
+		membership = 1;
+	}
+	return membership;
+}
+
+// Distance to goal
+// Support and core values 
+const float VERY_CLOSE_GOAL_CORE = 0.15;
+const float VERY_CLOSE_GOAL_SUPPORT = 0.45;
+
+const float CLOSE_GOAL_SUPPORT_1 = 0.15;
+const float CLOSE_GOAL_CORE = 0.45;
+const float CLOSE_GOAL_SUPPORT_2 = 0.75;
+
+const float FAR_GOAL_SUPPORT_1 = 0.45;
+const float FAR_GOAL_CORE = 0.75;
+const float FAR_GOAL_SUPPORT_2 = 1;
+
+const float VERY_FAR_GOAL_SUPPORT = .75;
+const float VERY_FAR_GOAL_CORE = 1;
+
+// Membership calculation
+float VeryCloseGoalSet(float value) {
+	float membership = 0;
+	if (value <= VERY_CLOSE_GOAL_CORE) {
+		membership = 1;
+	}
+	else if (value < VERY_CLOSE_GOAL_SUPPORT) {
+		membership = (value - VERY_CLOSE_GOAL_SUPPORT)
+			/ (VERY_CLOSE_GOAL_CORE - VERY_CLOSE_GOAL_SUPPORT);
+	}
+	return membership;
+}
+
+float CloseGoalSet(float value) {
+	float membership = 0;
+	if (value > CLOSE_GOAL_SUPPORT_1 && value < CLOSE_GOAL_CORE) {
+		membership = (value - CLOSE_GOAL_SUPPORT_1)
+			/ (CLOSE_GOAL_CORE - CLOSE_GOAL_SUPPORT_1);
+	}
+	else if (value == CLOSE_GOAL_CORE) {
+		membership = 1;
+	}
+	else if (value > CLOSE_GOAL_CORE && value < CLOSE_GOAL_SUPPORT_2) {
+		membership = (value - CLOSE_GOAL_SUPPORT_2)
+			/ (CLOSE_GOAL_CORE - CLOSE_GOAL_SUPPORT_2);
+	}
+	return membership;
+}
+
+float FarGoalSet(float value) {
+	float membership = 0;
+	if (value > FAR_GOAL_SUPPORT_1 && value < FAR_GOAL_CORE) {
+		membership = (value - FAR_GOAL_SUPPORT_1)
+			/ (FAR_GOAL_CORE - FAR_GOAL_SUPPORT_1);
+	}
+	else if (value == FAR_GOAL_CORE) {
+		membership = 1;
+	}
+	else if (value > FAR_GOAL_CORE && value < FAR_GOAL_SUPPORT_2) {
+		membership = (value - FAR_GOAL_SUPPORT_2)
+			/ (FAR_GOAL_CORE - FAR_GOAL_SUPPORT_2);
+	}
+	return membership;
+}
+
+float VeryFarGoalSet(float value) {
+	float membership = 0;
+	if (value > VERY_FAR_GOAL_SUPPORT) {
+		membership = (value - VERY_FAR_GOAL_SUPPORT)
+			/ (VERY_FAR_GOAL_CORE - VERY_FAR_GOAL_SUPPORT);
+	}
+	else if (value >= VERY_FAR_GOAL_CORE) {
 		membership = 1;
 	}
 	return membership;
