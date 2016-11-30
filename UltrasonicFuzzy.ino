@@ -12,8 +12,7 @@ uSensor ultrasonic2;
 uSensor ultrasonic3;
 uSensor ultrasonicArray[3] = { ultrasonic1 , ultrasonic2, ultrasonic3 };
 
-// class varibles
-
+// Class variables
 // Left Sensor
 float _veryNearLeftSensorMembership;
 float _nearLeftSensorMembership;
@@ -45,10 +44,24 @@ float _zeroAngleMembership;
 float _positiveAngleMembership;
 float _veryPositiveAngleMembership;
 
+// Left Motor Power
+float _veryNegativeLeftPowerMembership;
+float _negativeLeftPowerMembership;
+float _zeroLeftPowerMembership;
+float _positiveLeftPowerMembership;
+float _veryPositiveLeftPowerMembership;
+
+// Right Motor Power
+float _veryNegativeRightPowerMembership;
+float _negativeRightPowerMembership;
+float _zeroRightPowerMembership;
+float _positiveRightPowerMembership;
+float _veryPositiveRightPowerMembership;
+
 void setup()
 {
 	Serial.begin(9600);
-	Serial.println("Porta aberta");
+	Serial.println("Port open");
 	ultrasonicArray[0] = { sensor1Port, sensor1Trigger, 0 };
 	ultrasonicArray[1] = { sensor2Port, sensor2Trigger, 0 };
 	ultrasonicArray[2] = { sensor3Port, sensor3Trigger, 0 };
@@ -82,7 +95,66 @@ void loop()
 	delay(5000);
 	*/
 	
-	
+
+	// Sensor reading
+	float leftSensorValue = 0; // Substituir pela entrada do sensor
+	float frontSensorValue = 0; // Substituir pela entrada do sensor
+	float rightSensorValue = 0; // Substituir pela entrada do sensor
+	float distanceToGoal = 0; // Substituir pela entrada do GPS
+	float angleToGoal = 0; // Substituir pela entrada do GPS
+
+
+	// Fuzzification
+	// Left Sensor
+	float _veryNearLeftSensorMembership = VeryNearSensorSet(leftSensorValue);
+	float _nearLeftSensorMembership = NearSensorSet(leftSensorValue);
+	float _farLeftSensorMembership = FarSensorSet(leftSensorValue);
+	float _veryFarLeftSensorMembership = VeryFarSensorSet(leftSensorValue);
+
+	// Front Sensor
+	float _veryNearFrontSensorMembership = VeryNearSensorSet(frontSensorValue);
+	float _nearFrontSensorMembership = NearSensorSet(frontSensorValue);
+	float _farFrontSensorMembership = FarSensorSet(frontSensorValue);
+	float _veryFarFrontSensorMembership = VeryFarSensorSet(frontSensorValue);
+
+	// Right Sensor
+	float _veryNearRightSensorMembership = VeryNearSensorSet(rightSensorValue);
+	float _nearRightSensorMembership = NearSensorSet(rightSensorValue);
+	float _farRightSensorMembership = FarSensorSet(rightSensorValue);
+	float _veryFarRightSensorMembership = VeryFarSensorSet(rightSensorValue);
+
+	// Distance to Goal
+	float _veryNearGoalMembership = VeryNearGoalSet(distanceToGoal);
+	float _nearGoalMembership = NearGoalSet(distanceToGoal);
+	float _farGoalMembership = FarGoalSet(distanceToGoal);
+	float _veryFarGoalMembership = VeryFarGoalSet(distanceToGoal);
+
+	// Angle between Robot and Goal
+	float _veryNegativeAngleMembership = VeryNegativeAngleSet(angleToGoal);
+	float _negativeAngleMembership = NegativeAngleSet(angleToGoal);
+	float _zeroAngleMembership = ZeroAngleSet(angleToGoal);
+	float _positiveAngleMembership = PositiveAngleSet(angleToGoal);
+	float _veryPositiveAngleMembership = VeryPositiveAngleSet(angleToGoal);
+
+	// Rule application
+	// Left Motor Power
+	float _veryNegativeLeftPowerMembership = LeftMotorVeryNegative();
+	float _negativeLeftPowerMembership = LeftMotorNegative();
+	float _zeroLeftPowerMembership = LeftMotorZero();
+	float _positiveLeftPowerMembership = LeftMotorPositive();
+	float _veryPositiveLeftPowerMembership = LeftMotorVeryPositive();
+
+	// Right Motor Power
+	float _veryNegativeRightPowerMembership = RightMotorVeryNegative();
+	float _negativeRightPowerMembership = RightMotorNegative();
+	float _zeroRightPowerMembership = RightMotorZero();
+	float _positiveRightPowerMembership = RightMotorPositive();
+	float _veryPositiveRightPowerMembership = RightMotorVeryPositive();
+
+
+	// Defuzzification
+	float leftPowerOutput = LeftMotorDefuzzification();
+	float rightPowerOutput = RightMotorDefuzzification();
 }
 
 double evaluateSensor(struct uSensor sensor)
@@ -103,7 +175,9 @@ double evaluateSensor(struct uSensor sensor)
 
 /* FUZZY LOGIC */
 
-// Ultrassonic Sensors
+// Fuzzification
+
+// Ultrassonic sensors
 // Support and core values 
 const float VERY_NEAR_SENSOR_SET_CORE = 0.5;
 const float VERY_NEAR_SENSOR_SET_SUPPORT = 1;
@@ -754,4 +828,61 @@ float RightMotorVeryPositive() {
 		maximum = max(maximum, rightMotor[i]);
 	}
 	return maximum;
+}
+
+// Defuzzification 
+float LeftMotorDefuzzification() {
+	float leftMotorPower[5] = { 0,0,0,0,0 }, power = 0;
+	if (_veryNegativeLeftPowerMembership > 0) {
+		leftMotorPower[0] = VeryNegativePowerSet(_veryNegativeLeftPowerMembership);
+	}
+	if (_negativeLeftPowerMembership > 0) {
+		leftMotorPower[1] = NegativePowerSet(_negativeLeftPowerMembership);
+	}
+	if (_zeroLeftPowerMembership) {
+		leftMotorPower[2] = ZeroPowerSet(_zeroLeftPowerMembership);
+	}
+	if (_positiveLeftPowerMembership) {
+		leftMotorPower[3] = PositivePowerSet(_positiveLeftPowerMembership);
+	}
+	if (_veryPositiveLeftPowerMembership) {
+		leftMotorPower[4] = VeryPositivePowerSet(_veryPositiveLeftPowerMembership);
+	}
+	power = (leftMotorPower[0] * _veryNegativeLeftPowerMembership +
+		leftMotorPower[1] * _negativeLeftPowerMembership +
+		leftMotorPower[2] * _zeroLeftPowerMembership +
+		leftMotorPower[3] * _positiveLeftPowerMembership +
+		leftMotorPower[4] * _veryPositiveLeftPowerMembership) /
+		(_veryNegativeLeftPowerMembership + _negativeLeftPowerMembership +
+			_zeroLeftPowerMembership + _positiveLeftPowerMembership +
+			_veryPositiveLeftPowerMembership);
+	return power;
+}
+
+float RightMotorDefuzzification() {
+	float RightMotorPower[5] = { 0,0,0,0,0 }, power = 0;
+	if (_veryNegativeRightPowerMembership > 0) {
+		RightMotorPower[0] = VeryNegativePowerSet(_veryNegativeRightPowerMembership);
+	}
+	if (_negativeRightPowerMembership > 0) {
+		RightMotorPower[1] = NegativePowerSet(_negativeRightPowerMembership);
+	}
+	if (_zeroRightPowerMembership) {
+		RightMotorPower[2] = ZeroPowerSet(_zeroRightPowerMembership);
+	}
+	if (_positiveRightPowerMembership) {
+		RightMotorPower[3] = PositivePowerSet(_positiveRightPowerMembership);
+	}
+	if (_veryPositiveRightPowerMembership) {
+		RightMotorPower[4] = VeryPositivePowerSet(_veryPositiveRightPowerMembership);
+	}
+	power = (RightMotorPower[0] * _veryNegativeRightPowerMembership +
+		RightMotorPower[1] * _negativeRightPowerMembership +
+		RightMotorPower[2] * _zeroRightPowerMembership +
+		RightMotorPower[3] * _positiveRightPowerMembership +
+		RightMotorPower[4] * _veryPositiveRightPowerMembership) /
+		(_veryNegativeRightPowerMembership + _negativeRightPowerMembership +
+			_zeroRightPowerMembership + _positiveRightPowerMembership +
+			_veryPositiveRightPowerMembership);
+	return power;
 }
