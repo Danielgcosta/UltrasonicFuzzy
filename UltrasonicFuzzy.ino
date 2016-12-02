@@ -110,13 +110,13 @@ void loop()
 	delay(5000);
 	*/
 	
-
+/*
 	// Sensor reading (substituir pela leitura do sensor)
-	_leftSensorReading = 1;
-	_frontSensorReading = 1;
-	_rightSensorReading = 3;
+	_leftSensorReading = 10;
+	_frontSensorReading = 10;
+	_rightSensorReading = 10;
 	_distanceReading = 1;
-	_angleReading = 50;
+	_angleReading = 0;
 	
 	// Fuzzification
 	Fuzzify();
@@ -129,7 +129,9 @@ void loop()
 	RightMotorDefuzzification();
 	
 	printOutput();
-	delay(2000);
+	delay(2000);*/
+
+	SimulateWalk();
 }
 
 double evaluateSensor(struct uSensor sensor)
@@ -685,14 +687,15 @@ float LeftMotorVeryPositive() {
 	// IF( (LEFT  IS VERY FAR) AND (FRONT IS VERY NEAR) AND (ANGLE IS ZERO) )
 	// IF( (LEFT  IS VERY FAR) AND (ANGLE IS VERY POSITIVE) )
 	// IF( (LEFT  IS VERY NEAR) AND (FRONT IS NEAR) AND (ANGLE IS ZERO) )
-	leftMotor[0] = min(_zeroAngleMembership, _veryFarGoalMembership);
-	leftMotor[1] = min(_zeroAngleMembership, _farGoalMembership);
-	leftMotor[2] = min(_zeroAngleMembership, _nearGoalMembership);
+	//leftMotor[0] = min(_zeroAngleMembership, _veryFarGoalMembership);
+	//leftMotor[1] = min(_zeroAngleMembership, _farGoalMembership);
+	//leftMotor[2] = min(_zeroAngleMembership, _nearGoalMembership);
 	leftMotor[3] = min(_veryFarFrontSensorMembership, min(_zeroAngleMembership, _veryFarGoalMembership));
 	leftMotor[4] = min(_farFrontSensorMembership, min(_zeroAngleMembership, _veryFarGoalMembership));
 	leftMotor[5] = min(_veryFarFrontSensorMembership, min(_zeroAngleMembership, _farGoalMembership));
 	leftMotor[6] = min(_farFrontSensorMembership, min(_zeroAngleMembership, _farGoalMembership));
-	leftMotor[7] = min(_nearFrontSensorMembership, min(_zeroAngleMembership, _veryFarGoalMembership));
+	leftMotor[7] = 0;
+	//leftMotor[7] = min(_nearFrontSensorMembership, min(_zeroAngleMembership, _veryFarGoalMembership));
 	leftMotor[8] = min(_nearFrontSensorMembership, min(_zeroAngleMembership, _farGoalMembership));
 	leftMotor[9] = min(_veryNearLeftSensorMembership, min(_veryNearFrontSensorMembership, _zeroAngleMembership));
 	leftMotor[10] = min(_farLeftSensorMembership, _veryPositiveAngleMembership);
@@ -700,7 +703,8 @@ float LeftMotorVeryPositive() {
 	leftMotor[12] = min(_veryNearLeftSensorMembership, _veryNearFrontSensorMembership);
 	leftMotor[13] = min(_nearLeftSensorMembership, _veryNearFrontSensorMembership);
 	leftMotor[14] = min(_veryNearLeftSensorMembership, _nearFrontSensorMembership);
-	leftMotor[15] = min(_nearLeftSensorMembership, min(_nearFrontSensorMembership, _zeroAngleMembership));
+	leftMotor[15] = 0;
+	//leftMotor[15] = min(_nearLeftSensorMembership, min(_nearFrontSensorMembership, _zeroAngleMembership));
 	leftMotor[16] = min(_veryFarRightSensorMembership, _positiveAngleMembership);
 	leftMotor[17] = min(_farRightSensorMembership, _positiveAngleMembership);
 	leftMotor[18] = min(_veryFarLeftSensorMembership, _positiveAngleMembership);
@@ -712,8 +716,16 @@ float LeftMotorVeryPositive() {
 	leftMotor[24] = min(_veryFarLeftSensorMembership, min(_veryNearFrontSensorMembership, _zeroAngleMembership));
 	leftMotor[25] = min(_veryFarLeftSensorMembership, _veryPositiveAngleMembership);
 	leftMotor[26] = min(_veryNearLeftSensorMembership, min(_nearFrontSensorMembership, _zeroAngleMembership));
-	for (unsigned int i = 0; i < 27; i++) {
+	for (unsigned int i = 3; i < 27; i++) {
 		maximum = max(maximum, leftMotor[i]);
+
+		if (leftMotor[i] != 0) {
+			// for debugging
+			Serial.print(i);
+			Serial.print(" LMVP ");
+			Serial.print(leftMotor[i]);
+			Serial.print(" / ");
+		}
 	}
 	return maximum;
 }
@@ -739,6 +751,14 @@ float LeftMotorPositive() {
 
 	for (unsigned int i = 0; i < 8; i++) {
 		maximum = max(maximum, leftMotor[i]);
+
+		if (leftMotor[i] != 0) {
+			// for debugging
+			Serial.print(i);
+			Serial.print(" LMP ");
+			Serial.print(leftMotor[i]);
+			Serial.print(" / ");
+		}
 	}
 	return maximum;
 }
@@ -764,6 +784,14 @@ float LeftMotorNegative() {
 	leftMotor[5] = min(_nearFrontSensorMembership, _nearRightSensorMembership);
 	for (unsigned int i = 0; i < 6; i++) {
 		maximum = max(maximum, leftMotor[i]);
+
+		if (leftMotor[i] != 0) {
+			// for debugging
+			Serial.print(i);
+			Serial.print(" LMN ");
+			Serial.print(leftMotor[i]);
+			Serial.print(" / ");
+		}
 	}
 	return maximum;
 }
@@ -784,6 +812,14 @@ float LeftMotorVeryNegative() {
 	leftMotor[5] = min(_veryNearFrontSensorMembership, _nearRightSensorMembership);
 	for (unsigned int i = 0; i < 6; i++) {
 		maximum = max(maximum, leftMotor[i]);
+
+		if (leftMotor[i] != 0) {
+			// for debugging
+			Serial.print(i);
+			Serial.print(" LMVN ");
+			Serial.print(leftMotor[i]);
+			Serial.print(" / ");
+		}
 	}
 	return maximum;
 }
@@ -817,9 +853,9 @@ float RightMotorVeryPositive() {
 	// IF( (FRONT IS VERY NEAR) AND (RIGHT IS VERY NEAR) )
 	// IF( (FRONT IS NEAR) AND (RIGHT IS VERY NEAR) )
 	// IF( (FRONT IS VERY NEAR) AND (RIGHT IS NEAR) )
-	rightMotor[0] = min(_zeroAngleMembership, _veryFarGoalMembership);
-	rightMotor[1] = min(_zeroAngleMembership, _farGoalMembership);
-	rightMotor[2] = min(_zeroAngleMembership, _nearGoalMembership);
+	//rightMotor[0] = min(_zeroAngleMembership, _veryFarGoalMembership);
+	//rightMotor[1] = min(_zeroAngleMembership, _farGoalMembership);
+	//rightMotor[2] = min(_zeroAngleMembership, _nearGoalMembership);
 	rightMotor[3] = min(_veryFarFrontSensorMembership, min(_zeroAngleMembership, _veryFarGoalMembership));
 	rightMotor[4] = min(_farFrontSensorMembership, min(_zeroAngleMembership, _veryFarGoalMembership));
 	rightMotor[5] = min(_veryFarFrontSensorMembership, min(_zeroAngleMembership, _farGoalMembership));
@@ -844,7 +880,7 @@ float RightMotorVeryPositive() {
 	rightMotor[24] = min(_veryNearFrontSensorMembership, _veryNearRightSensorMembership);
 	rightMotor[25] = min(_nearFrontSensorMembership, _veryNearRightSensorMembership);
 	rightMotor[26] = min(_veryNearFrontSensorMembership, _nearRightSensorMembership);
-	for (unsigned int i = 0; i < 27; i++) {
+	for (unsigned int i = 3; i < 27; i++) {
 		maximum = max(maximum, rightMotor[i]);
 	}
 	return maximum;
@@ -1077,3 +1113,70 @@ void printOutput() {
 	Serial.print(_rightMotorActivation*100);
 	Serial.println("%");
 }
+
+// Input mode for testing 
+void setInput(float leftSensor, float frontSensor, float rightSensor, float distanceToGoal, float angleToGoal) {
+	_leftSensorReading = leftSensor;
+	_frontSensorReading = frontSensor;
+	_rightSensorReading = rightSensor;
+	_distanceReading = distanceToGoal;
+	_angleReading = angleToGoal;
+}
+
+// Fuzzy process run example
+void runFuzzyProcess() {
+	Fuzzify();
+	processRules();
+	LeftMotorDefuzzification();
+	RightMotorDefuzzification();
+	printOutput();
+}
+// Testing some positions to know how the fuzzy is working
+void SimulateWalk() {
+	float barrierPosition = 3;
+
+	float leftSensor = 10;
+	float frontSensor = 10;
+	float rightSensor = 10;
+	float angleToGoal = 3.1415972/100;
+
+	float positionX = 0;
+	float positionY = 0;
+
+	float speed = 0.1;
+	for (unsigned int i = 0; i < 1000; i++) {
+		setInput(leftSensor, frontSensor, rightSensor, 1, angleToGoal);
+		runFuzzyProcess();
+
+		// angle and position correction
+		angleToGoal += (_rightMotorActivation - _leftMotorActivation)*speed;
+		positionX += sin(angleToGoal)*(_rightMotorActivation + _leftMotorActivation)*speed / 2;
+		positionY += cos(angleToGoal)*(_rightMotorActivation + _leftMotorActivation)*speed / 2;
+
+		// sensor correction
+		leftSensor = (barrierPosition - positionY) / cos(angleToGoal + 3.1415 / 8);
+		frontSensor = (barrierPosition - positionY) / cos(angleToGoal);
+		rightSensor = (barrierPosition - positionY) / cos(angleToGoal - 3.1415 / 8);
+
+		// Print results on serial port
+		Serial.print("Left ");
+		Serial.print(leftSensor);
+		Serial.print(" / Front ");
+		Serial.print(frontSensor);
+		Serial.print(" / Right ");
+		Serial.println(rightSensor);
+
+		Serial.print("Angle ");
+		Serial.print(angleToGoal);
+		Serial.print(" / PosX ");
+		Serial.print(positionX);
+		Serial.print(" / PosY ");
+		Serial.println(positionY);
+		Serial.println();
+
+		//printData();
+
+		delay(1000);
+	}
+}
+
