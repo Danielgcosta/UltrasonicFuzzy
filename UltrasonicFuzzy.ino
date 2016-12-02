@@ -1,3 +1,5 @@
+
+
 const int NUMBER_OF_READINGS = 3;
 
 typedef struct uSensor { int dataPort; int triggerPort; double value; };
@@ -13,6 +15,14 @@ uSensor ultrasonic3;
 uSensor ultrasonicArray[3] = { ultrasonic1 , ultrasonic2, ultrasonic3 };
 
 // Class variables
+// Sensor readings
+float _leftSensorReading = 0;
+float _frontSensorReading = 0;
+float _rightSensorReading = 0;
+float _distanceReading = 0;
+float _angleReading = 0;
+
+// Membership values
 // Left Sensor
 float _veryNearLeftSensorMembership = 0;
 float _nearLeftSensorMembership = 0;
@@ -58,6 +68,11 @@ float _zeroRightPowerMembership = 0;
 float _positiveRightPowerMembership = 0;
 float _veryPositiveRightPowerMembership = 0;
 
+// Motor activation 
+float _leftMotorActivation = 0;
+float _rightMotorActivation = 0;
+
+
 void setup()
 {
 	Serial.begin(9600);
@@ -96,65 +111,25 @@ void loop()
 	*/
 	
 
-	// Sensor reading
-	float leftSensorValue = 10; // Substituir pela entrada do sensor
-	float frontSensorValue = 10; // Substituir pela entrada do sensor
-	float rightSensorValue = 10; // Substituir pela entrada do sensor
-	float distanceToGoal = 1; // Substituir pela entrada do GPS
-	float angleToGoal = 0; // Substituir pela entrada do GPS
-
+	// Sensor reading (substituir pela leitura do sensor)
+	_leftSensorReading = 10;
+	_frontSensorReading = 10;
+	_rightSensorReading = 10;
+	_distanceReading = 1;
+	_angleReading = 0;
 	
 	// Fuzzification
-	// Left Sensor
-	float _veryNearLeftSensorMembership = VeryNearSensorSet(leftSensorValue);
-	float _nearLeftSensorMembership = NearSensorSet(leftSensorValue);
-	float _farLeftSensorMembership = FarSensorSet(leftSensorValue);
-	float _veryFarLeftSensorMembership = VeryFarSensorSet(leftSensorValue);
-
-	// Front Sensor
-	float _veryNearFrontSensorMembership = VeryNearSensorSet(frontSensorValue);
-	float _nearFrontSensorMembership = NearSensorSet(frontSensorValue);
-	float _farFrontSensorMembership = FarSensorSet(frontSensorValue);
-	float _veryFarFrontSensorMembership = VeryFarSensorSet(frontSensorValue);
-
-	// Right Sensor
-	float _veryNearRightSensorMembership = VeryNearSensorSet(rightSensorValue);
-	float _nearRightSensorMembership = NearSensorSet(rightSensorValue);
-	float _farRightSensorMembership = FarSensorSet(rightSensorValue);
-	float _veryFarRightSensorMembership = VeryFarSensorSet(rightSensorValue);
-
-	// Distance to Goal
-	float _veryNearGoalMembership = VeryNearGoalSet(distanceToGoal);
-	float _nearGoalMembership = NearGoalSet(distanceToGoal);
-	float _farGoalMembership = FarGoalSet(distanceToGoal);
-	float _veryFarGoalMembership = VeryFarGoalSet(distanceToGoal);
-
-	// Angle between Robot and Goal
-	float _veryNegativeAngleMembership = VeryNegativeAngleSet(angleToGoal);
-	float _negativeAngleMembership = NegativeAngleSet(angleToGoal);
-	float _zeroAngleMembership = ZeroAngleSet(angleToGoal);
-	float _positiveAngleMembership = PositiveAngleSet(angleToGoal);
-	float _veryPositiveAngleMembership = VeryPositiveAngleSet(angleToGoal);
+	Fuzzify();
 
 	// Rule application
-	// Left Motor Power
-	float _veryNegativeLeftPowerMembership = LeftMotorVeryNegative();
-	float _negativeLeftPowerMembership = LeftMotorNegative();
-	float _zeroLeftPowerMembership = LeftMotorZero();
-	float _positiveLeftPowerMembership = LeftMotorPositive();
-	float _veryPositiveLeftPowerMembership = LeftMotorVeryPositive();
-
-	// Right Motor Power
-	float _veryNegativeRightPowerMembership = RightMotorVeryNegative();
-	float _negativeRightPowerMembership = RightMotorNegative();
-	float _zeroRightPowerMembership = RightMotorZero();
-	float _positiveRightPowerMembership = RightMotorPositive();
-	float _veryPositiveRightPowerMembership = RightMotorVeryPositive();
-
+	processRules();
 
 	// Defuzzification
-	float leftPowerOutput = LeftMotorDefuzzification();
-	float rightPowerOutput = RightMotorDefuzzification();
+	LeftMotorDefuzzification();
+	RightMotorDefuzzification();
+	
+	printData();
+	delay(2000);
 }
 
 double evaluateSensor(struct uSensor sensor)
@@ -643,6 +618,39 @@ void PowerFuzzyTest() {
 	delay(1000);
 }
 
+void Fuzzify() {
+	// Left Sensor
+	_veryNearLeftSensorMembership = VeryNearSensorSet(_leftSensorReading);
+	_nearLeftSensorMembership = NearSensorSet(_leftSensorReading);
+	_farLeftSensorMembership = FarSensorSet(_leftSensorReading);
+	_veryFarLeftSensorMembership = VeryFarSensorSet(_leftSensorReading);
+
+	// Front Sensor
+	_veryNearFrontSensorMembership = VeryNearSensorSet(_frontSensorReading);
+	_nearFrontSensorMembership = NearSensorSet(_frontSensorReading);
+	_farFrontSensorMembership = FarSensorSet(_frontSensorReading);
+	_veryFarFrontSensorMembership = VeryFarSensorSet(_frontSensorReading);
+
+	// Right Sensor
+	_veryNearRightSensorMembership = VeryNearSensorSet(_rightSensorReading);
+	_nearRightSensorMembership = NearSensorSet(_rightSensorReading);
+	_farRightSensorMembership = FarSensorSet(_rightSensorReading);
+	_veryFarRightSensorMembership = VeryFarSensorSet(_rightSensorReading);
+
+	// Distance to Goal
+	_veryNearGoalMembership = VeryNearGoalSet(_distanceReading);
+	_nearGoalMembership = NearGoalSet(_distanceReading);
+	_farGoalMembership = FarGoalSet(_distanceReading);
+	_veryFarGoalMembership = VeryFarGoalSet(_distanceReading);
+
+	// Angle between Robot and Goal
+	_veryNegativeAngleMembership = VeryNegativeAngleSet(_angleReading);
+	_negativeAngleMembership = NegativeAngleSet(_angleReading);
+	_zeroAngleMembership = ZeroAngleSet(_angleReading);
+	_positiveAngleMembership = PositiveAngleSet(_angleReading);
+	_veryPositiveAngleMembership = VeryPositiveAngleSet(_angleReading);
+}
+
 // FUZZY RULES
 float LeftMotorVeryNegative() {
 	float maximum = 0., leftMotor[4];
@@ -830,59 +838,152 @@ float RightMotorVeryPositive() {
 	return maximum;
 }
 
+void processRules() {
+	// Left Motor Power
+	_veryNegativeLeftPowerMembership = LeftMotorVeryNegative();
+	_negativeLeftPowerMembership = LeftMotorNegative();
+	_zeroLeftPowerMembership = LeftMotorZero();
+	_positiveLeftPowerMembership = LeftMotorPositive();
+	_veryPositiveLeftPowerMembership = LeftMotorVeryPositive();
+
+	// Right Motor Power
+	_veryNegativeRightPowerMembership = RightMotorVeryNegative();
+	_negativeRightPowerMembership = RightMotorNegative();
+	_zeroRightPowerMembership = RightMotorZero();
+	_positiveRightPowerMembership = RightMotorPositive();
+	_veryPositiveRightPowerMembership = RightMotorVeryPositive();
+}
+
 // Defuzzification 
 float LeftMotorDefuzzification() {
-	float leftMotorPower[5] = { 0,0,0,0,0 }, power = 0;
-	if (_veryNegativeLeftPowerMembership > 0) {
-		leftMotorPower[0] = VeryNegativePowerSet(_veryNegativeLeftPowerMembership);
-	}
-	if (_negativeLeftPowerMembership > 0) {
-		leftMotorPower[1] = NegativePowerSet(_negativeLeftPowerMembership);
-	}
-	if (_zeroLeftPowerMembership) {
-		leftMotorPower[2] = ZeroPowerSet(_zeroLeftPowerMembership);
-	}
-	if (_positiveLeftPowerMembership) {
-		leftMotorPower[3] = PositivePowerSet(_positiveLeftPowerMembership);
-	}
-	if (_veryPositiveLeftPowerMembership) {
-		leftMotorPower[4] = VeryPositivePowerSet(_veryPositiveLeftPowerMembership);
-	}
-	power = (leftMotorPower[0] * _veryNegativeLeftPowerMembership +
-		leftMotorPower[1] * _negativeLeftPowerMembership +
-		leftMotorPower[2] * _zeroLeftPowerMembership +
-		leftMotorPower[3] * _positiveLeftPowerMembership +
-		leftMotorPower[4] * _veryPositiveLeftPowerMembership) /
+	// Center of Maximum
+	_leftMotorActivation = (VERY_NEGATIVE_POWER_CORE * _veryNegativeLeftPowerMembership +
+		NEGATIVE_POWER_CORE * _negativeLeftPowerMembership +
+		ZERO_POWER_CORE * _zeroLeftPowerMembership +
+		POSITIVE_POWER_CORE * _positiveLeftPowerMembership +
+		VERY_POSITIVE_POWER_CORE * _veryPositiveLeftPowerMembership) /
 		(_veryNegativeLeftPowerMembership + _negativeLeftPowerMembership +
 			_zeroLeftPowerMembership + _positiveLeftPowerMembership +
 			_veryPositiveLeftPowerMembership);
-	return power;
+	return _leftMotorActivation;
 }
 
 float RightMotorDefuzzification() {
-	float RightMotorPower[5] = { 0,0,0,0,0 }, power = 0;
-	if (_veryNegativeRightPowerMembership > 0) {
-		RightMotorPower[0] = VeryNegativePowerSet(_veryNegativeRightPowerMembership);
-	}
-	if (_negativeRightPowerMembership > 0) {
-		RightMotorPower[1] = NegativePowerSet(_negativeRightPowerMembership);
-	}
-	if (_zeroRightPowerMembership) {
-		RightMotorPower[2] = ZeroPowerSet(_zeroRightPowerMembership);
-	}
-	if (_positiveRightPowerMembership) {
-		RightMotorPower[3] = PositivePowerSet(_positiveRightPowerMembership);
-	}
-	if (_veryPositiveRightPowerMembership) {
-		RightMotorPower[4] = VeryPositivePowerSet(_veryPositiveRightPowerMembership);
-	}
-	power = (RightMotorPower[0] * _veryNegativeRightPowerMembership +
-		RightMotorPower[1] * _negativeRightPowerMembership +
-		RightMotorPower[2] * _zeroRightPowerMembership +
-		RightMotorPower[3] * _positiveRightPowerMembership +
-		RightMotorPower[4] * _veryPositiveRightPowerMembership) /
+	// Center of Maximum
+	_rightMotorActivation = (VERY_NEGATIVE_POWER_CORE * _veryNegativeRightPowerMembership +
+		NEGATIVE_POWER_CORE * _negativeRightPowerMembership +
+		ZERO_POWER_CORE * _zeroRightPowerMembership +
+		POSITIVE_POWER_CORE * _positiveRightPowerMembership +
+		VERY_POSITIVE_POWER_CORE * _veryPositiveRightPowerMembership) /
 		(_veryNegativeRightPowerMembership + _negativeRightPowerMembership +
 			_zeroRightPowerMembership + _positiveRightPowerMembership +
 			_veryPositiveRightPowerMembership);
-	return power;
+	return _rightMotorActivation;
+}
+
+// Prints organized membership information
+void printData() {
+	//DEBUG PRINT
+	// Sensor Readings
+	Serial.println("SENSOR READING:");
+	Serial.print("LEFT  ");
+	Serial.println(_leftSensorReading);
+	Serial.print("FRONT ");
+	Serial.println(_frontSensorReading);
+	Serial.print("RIGHT ");
+	Serial.println(_rightSensorReading);
+	Serial.print("DISTANCE TO GOAL ");
+	Serial.println(_distanceReading);
+	Serial.print("ANGLE TO GOAL    ");
+	Serial.println(_angleReading);
+
+	// Left Sensor
+	Serial.println("LEFT SENSOR");
+	Serial.print("VERY NEAR ");
+	Serial.println(_veryNearLeftSensorMembership);
+	Serial.print("NEAR      ");
+	Serial.println(_nearLeftSensorMembership);
+	Serial.print("FAR       ");
+	Serial.println(_farLeftSensorMembership);
+	Serial.print("VERY FAR  ");
+	Serial.println(_veryFarLeftSensorMembership);
+
+	// Front Sensor
+	Serial.println("FRONT SENSOR");
+	Serial.print("VERY NEAR ");
+	Serial.println(_veryNearFrontSensorMembership);
+	Serial.print("NEAR      ");
+	Serial.println(_nearFrontSensorMembership);
+	Serial.print("FAR       ");
+	Serial.println(_farFrontSensorMembership);
+	Serial.print("VERY FAR  ");
+	Serial.println(_veryFarFrontSensorMembership);
+
+	// Right Sensor
+	Serial.println("RIGHT SENSOR");
+	Serial.print("VERY NEAR ");
+	Serial.println(_veryNearRightSensorMembership);
+	Serial.print("NEAR      ");
+	Serial.println(_nearRightSensorMembership);
+	Serial.print("FAR       ");
+	Serial.println(_farRightSensorMembership);
+	Serial.print("VERY FAR  ");
+	Serial.println(_veryFarRightSensorMembership);
+
+	// Distance to Goal
+	Serial.println("DISTANCE TO GOAL");
+	Serial.print("VERY NEAR ");
+	Serial.println(_veryNearGoalMembership);
+	Serial.print("NEAR      ");
+	Serial.println(_nearGoalMembership);
+	Serial.print("FAR       ");
+	Serial.println(_farGoalMembership);
+	Serial.print("VERY FAR  ");
+	Serial.println(_veryFarGoalMembership);
+
+	// Angle between Robot and Goal
+	Serial.println("ANGLE TO GOAL");
+	Serial.print("VERY NEGATIVE ");
+	Serial.println(_veryNegativeAngleMembership);
+	Serial.print("NEGATIVE      ");
+	Serial.println(_negativeAngleMembership);
+	Serial.print("ZERO          ");
+	Serial.println(_zeroAngleMembership);
+	Serial.print("POSITIVE      ");
+	Serial.println(_positiveAngleMembership);
+	Serial.print("VERY POSITIVE ");
+	Serial.println(_veryPositiveAngleMembership);
+
+	// Left Motor Power
+	Serial.println("LEFT MOTOR POWER");
+	Serial.print("VERY NEGATIVE ");
+	Serial.println(_veryNegativeLeftPowerMembership);
+	Serial.print("NEGATIVE      ");
+	Serial.println(_negativeLeftPowerMembership);
+	Serial.print("ZERO          ");
+	Serial.println(_zeroLeftPowerMembership);
+	Serial.print("POSITIVE      ");
+	Serial.println(_positiveLeftPowerMembership);
+	Serial.print("VERY POSITIVE ");
+	Serial.println(_veryPositiveLeftPowerMembership);
+
+	// Right Motor Power
+	Serial.println("RIGHT MOTOR POWER");
+	Serial.print("VERY NEGATIVE ");
+	Serial.println(_veryNegativeRightPowerMembership);
+	Serial.print("NEGATIVE      ");
+	Serial.println(_negativeRightPowerMembership);
+	Serial.print("ZERO          ");
+	Serial.println(_zeroRightPowerMembership);
+	Serial.print("POSITIVE      ");
+	Serial.println(_positiveRightPowerMembership);
+	Serial.print("VERY POSITIVE ");
+	Serial.println(_veryPositiveRightPowerMembership);
+
+	Serial.println();
+	Serial.print("LEFT=");
+	Serial.print(_leftMotorActivation);
+	Serial.print(" RIGHT=");
+	Serial.println(_rightMotorActivation);
+	Serial.println();
 }
