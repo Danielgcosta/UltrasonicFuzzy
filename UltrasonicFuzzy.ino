@@ -718,14 +718,6 @@ float LeftMotorVeryPositive() {
 	leftMotor[26] = min(_veryNearLeftSensorMembership, min(_nearFrontSensorMembership, _zeroAngleMembership));
 	for (unsigned int i = 3; i < 27; i++) {
 		maximum = max(maximum, leftMotor[i]);
-
-		if (leftMotor[i] != 0) {
-			// for debugging
-			Serial.print(i);
-			Serial.print(" LMVP ");
-			Serial.print(leftMotor[i]);
-			Serial.print(" / ");
-		}
 	}
 	return maximum;
 }
@@ -751,14 +743,6 @@ float LeftMotorPositive() {
 
 	for (unsigned int i = 0; i < 8; i++) {
 		maximum = max(maximum, leftMotor[i]);
-
-		if (leftMotor[i] != 0) {
-			// for debugging
-			Serial.print(i);
-			Serial.print(" LMP ");
-			Serial.print(leftMotor[i]);
-			Serial.print(" / ");
-		}
 	}
 	return maximum;
 }
@@ -784,14 +768,6 @@ float LeftMotorNegative() {
 	leftMotor[5] = min(_nearFrontSensorMembership, _nearRightSensorMembership);
 	for (unsigned int i = 0; i < 6; i++) {
 		maximum = max(maximum, leftMotor[i]);
-
-		if (leftMotor[i] != 0) {
-			// for debugging
-			Serial.print(i);
-			Serial.print(" LMN ");
-			Serial.print(leftMotor[i]);
-			Serial.print(" / ");
-		}
 	}
 	return maximum;
 }
@@ -812,14 +788,6 @@ float LeftMotorVeryNegative() {
 	leftMotor[5] = min(_veryNearFrontSensorMembership, _nearRightSensorMembership);
 	for (unsigned int i = 0; i < 6; i++) {
 		maximum = max(maximum, leftMotor[i]);
-
-		if (leftMotor[i] != 0) {
-			// for debugging
-			Serial.print(i);
-			Serial.print(" LMVN ");
-			Serial.print(leftMotor[i]);
-			Serial.print(" / ");
-		}
 	}
 	return maximum;
 }
@@ -860,9 +828,11 @@ float RightMotorVeryPositive() {
 	rightMotor[4] = min(_farFrontSensorMembership, min(_zeroAngleMembership, _veryFarGoalMembership));
 	rightMotor[5] = min(_veryFarFrontSensorMembership, min(_zeroAngleMembership, _farGoalMembership));
 	rightMotor[6] = min(_farFrontSensorMembership, min(_zeroAngleMembership, _farGoalMembership));
-	rightMotor[7] = min(_nearFrontSensorMembership, min(_zeroAngleMembership, _veryFarGoalMembership));
+	rightMotor[7] = 0;
+	//rightMotor[7] = min(_nearFrontSensorMembership, min(_zeroAngleMembership, _veryFarGoalMembership));
 	rightMotor[8] = min(_nearFrontSensorMembership, min(_zeroAngleMembership, _farGoalMembership));
-	rightMotor[9] = min(_nearFrontSensorMembership, min(_nearRightSensorMembership, _zeroAngleMembership));
+	rightMotor[9] = 0;
+	//rightMotor[9] = min(_nearFrontSensorMembership, min(_nearRightSensorMembership, _zeroAngleMembership));
 	rightMotor[10] = min(_veryFarRightSensorMembership, _negativeAngleMembership);
 	rightMotor[11] = min(_farRightSensorMembership, _negativeAngleMembership);
 	rightMotor[12] = min(_veryFarLeftSensorMembership, _negativeAngleMembership);
@@ -1138,7 +1108,7 @@ void SimulateWalk() {
 	float leftSensor = 10;
 	float frontSensor = 10;
 	float rightSensor = 10;
-	float angleToGoal = 3.1415972/100;
+	float angleToGoal = -3.1415972/10;
 
 	float positionX = 0;
 	float positionY = 0;
@@ -1150,13 +1120,22 @@ void SimulateWalk() {
 
 		// angle and position correction
 		angleToGoal += (_rightMotorActivation - _leftMotorActivation)*speed;
-		positionX += sin(angleToGoal)*(_rightMotorActivation + _leftMotorActivation)*speed / 2;
+		positionX += -sin(angleToGoal)*(_rightMotorActivation + _leftMotorActivation)*speed / 2;
 		positionY += cos(angleToGoal)*(_rightMotorActivation + _leftMotorActivation)*speed / 2;
 
 		// sensor correction
-		leftSensor = (barrierPosition - positionY) / cos(angleToGoal + 3.1415 / 8);
-		frontSensor = (barrierPosition - positionY) / cos(angleToGoal);
-		rightSensor = (barrierPosition - positionY) / cos(angleToGoal - 3.1415 / 8);
+		if (cos(angleToGoal + 3.1415 / 8) != 0) {
+			leftSensor = (barrierPosition - positionY) / cos(angleToGoal + 3.1415 / 8);
+		}
+		else leftSensor = 100;
+		if ( cos(angleToGoal) ){
+			frontSensor = (barrierPosition - positionY) / cos(angleToGoal);
+		}
+		else frontSensor = 100;
+		if (cos(angleToGoal - 3.1415 / 8) ){
+			rightSensor = (barrierPosition - positionY) / cos(angleToGoal - 3.1415 / 8);
+		}
+		else rightSensor = 100;
 
 		// Print results on serial port
 		Serial.print("Left ");
@@ -1174,7 +1153,7 @@ void SimulateWalk() {
 		Serial.println(positionY);
 		Serial.println();
 
-		//printData();
+		printData();
 
 		delay(1000);
 	}
