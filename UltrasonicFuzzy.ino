@@ -1,8 +1,15 @@
-
+// Puc-Rio/ DEE/ LRI 
+// Daniel Guimarães Costa
+// Medusa2 2016
 
 const int NUMBER_OF_READINGS = 3;
 
 typedef struct uSensor { int dataPort; int triggerPort; double value; };
+typedef struct tSensor { int dataPort; double value; };
+typedef struct doSensor { int dataPort; double value; };
+typedef struct orpSensor { int dataPort; double value; };
+typedef struct phSensor { int dataPort; double value; };
+
 int sensor1Port		= 1;
 int sensor1Trigger	= 2;
 int sensor2Port		= 3;
@@ -149,6 +156,77 @@ double evaluateSensor(struct uSensor sensor)
 	unsigned long pulse = pulseIn(sensor.dataPort, HIGH);
 	return pulse / 58.;
 }
+
+double evaluateSensor(struct tSensor sensor) {
+	// Calibrate sensor
+	// 1st wire ----[GND]
+	// 2nd wire ----[DATA] 
+	//			\---[4,7K]----[5V]
+
+	// For example, if analog pin reads 250-700 when temps are 1.4C to 44.1C
+	//float x = map(analogRead(_port), 250, 700, 14, 441)/10;  
+	//_value /= 10.0;          // divide by 10; map() uses integers
+	//return value;
+}
+
+
+double evaluateSensor(struct doSensor sensor) {
+	/*
+	String sensorString;
+	// If a Stringacter has been received
+	if (dissolvedOxygenSerial.available() > 0)
+	{
+	// Gets the received String
+	String inString = (String)dissolvedOxygenSerial.read();
+	// Composes the String
+	sensorString += inString;
+	// Reading ends with a CR
+	if (inString == '\r') {
+	_value = sensorString.toFloat();
+	}
+	}
+	*/
+
+	// DELETAR:
+	//_value = 3;
+}
+
+
+double evaluateSensor(struct orpSensor sensor) {
+	/*
+	String sensorString;
+	// If a Stringacter has been received
+	if (oxygenReductionSerial.available() > 0)
+	{
+	// Gets the received String
+	String inString = (String)oxygenReductionSerial.read();
+	// Composes the String
+	sensorString += inString;
+	// Reading ends with a CR
+	if (inString == '\r') {
+	_value = sensorString.toFloat();
+	}
+	}
+	*/
+
+	// DELETAR:
+	//_value = 4;
+}
+
+
+double evaluateSensor(struct phSensor sensor) {
+	// E = E0 + RT*ln(alphaH+)/F = E0 - 2.303*R*T*pH/F
+	// R = Ideal Gas Constant
+	// T = Temperature in Kelvin
+	// F = Faraday constant
+
+	// Hence we must calibrate E0 with the neutral solution
+	const float E0 = 1; //dummy value for now, overwrite with calibration value
+						//_value = (E0-E)*F/(2.303*R*T)
+
+	//_value = 2;
+}
+
 
 /* FUZZY LOGIC */
 
@@ -716,7 +794,8 @@ float LeftMotorVeryPositive() {
 	leftMotor[24] = min(_veryFarLeftSensorMembership, min(_veryNearFrontSensorMembership, _zeroAngleMembership));
 	leftMotor[25] = min(_veryFarLeftSensorMembership, _veryPositiveAngleMembership);
 	leftMotor[26] = min(_veryNearLeftSensorMembership, min(_nearFrontSensorMembership, _zeroAngleMembership));
-	for (unsigned int i = 3; i < 27; i++) {
+	leftMotor[27] = min(_veryFarLeftSensorMembership, min(_veryFarFrontSensorMembership, min(_veryFarRightSensorMembership, _veryNegativeAngleMembership)));
+	for (unsigned int i = 3; i < 28; i++) {
 		maximum = max(maximum, leftMotor[i]);
 	}
 	return maximum;
@@ -740,7 +819,6 @@ float LeftMotorPositive() {
 	leftMotor[5] = min(_nearFrontSensorMembership, min(_veryFarRightSensorMembership, _zeroAngleMembership));
 	leftMotor[6] = min(_nearFrontSensorMembership, min(_farRightSensorMembership, _zeroAngleMembership));
 	leftMotor[7] = min(_nearLeftSensorMembership, _nearFrontSensorMembership);
-
 	for (unsigned int i = 0; i < 8; i++) {
 		maximum = max(maximum, leftMotor[i]);
 	}
@@ -786,7 +864,8 @@ float LeftMotorVeryNegative() {
 	leftMotor[3] = min(_veryNearFrontSensorMembership, _veryNearRightSensorMembership);
 	leftMotor[4] = min(_nearFrontSensorMembership, _veryNearRightSensorMembership);
 	leftMotor[5] = min(_veryNearFrontSensorMembership, _nearRightSensorMembership);
-	for (unsigned int i = 0; i < 6; i++) {
+	leftMotor[6] = min(_veryFarLeftSensorMembership, min(_veryFarFrontSensorMembership, min(_veryFarRightSensorMembership, _veryNegativeAngleMembership)));
+	for (unsigned int i = 0; i < 7; i++) {
 		maximum = max(maximum, leftMotor[i]);
 	}
 	return maximum;
@@ -850,7 +929,8 @@ float RightMotorVeryPositive() {
 	rightMotor[24] = min(_veryNearFrontSensorMembership, _veryNearRightSensorMembership);
 	rightMotor[25] = min(_nearFrontSensorMembership, _veryNearRightSensorMembership);
 	rightMotor[26] = min(_veryNearFrontSensorMembership, _nearRightSensorMembership);
-	for (unsigned int i = 3; i < 27; i++) {
+	rightMotor[27] = min(_veryFarLeftSensorMembership, min(_veryFarFrontSensorMembership, min(_veryFarRightSensorMembership, _veryNegativeAngleMembership)));
+	for (unsigned int i = 3; i < 28; i++) {
 		maximum = max(maximum, rightMotor[i]);
 	}
 	return maximum;
@@ -919,7 +999,8 @@ float RightMotorVeryNegative() {
 	rightMotor[3] = min(_veryNearLeftSensorMembership, _veryNearFrontSensorMembership);
 	rightMotor[4] = min(_nearLeftSensorMembership, _veryNearFrontSensorMembership);
 	rightMotor[5] = min(_veryNearLeftSensorMembership, _nearFrontSensorMembership);
-	for (unsigned int i = 0; i < 6; i++) {
+	rightMotor[6] = min(_veryFarLeftSensorMembership, min(_veryFarFrontSensorMembership, min(_veryFarRightSensorMembership, _veryPositiveAngleMembership)));
+	for (unsigned int i = 0; i < 7; i++) {
 		maximum = max(maximum, rightMotor[i]);
 	}
 	return maximum;
@@ -1099,11 +1180,10 @@ void runFuzzyProcess() {
 	processRules();
 	LeftMotorDefuzzification();
 	RightMotorDefuzzification();
-	printOutput();
 }
 // Testing some positions to know how the fuzzy is working
 void SimulateWalk() {
-	float barrierPosition = 3;
+	float barrierPosition = 10;
 
 	float leftSensor = 10;
 	float frontSensor = 10;
@@ -1112,32 +1192,44 @@ void SimulateWalk() {
 
 	float positionX = 0;
 	float positionY = 0;
+	float distanceToGoal = sqrt(positionX*positionX + (15 - positionY)*(15 - positionY));
 
 	float speed = 0.1;
+	int counter = 0;
 	for (unsigned int i = 0; i < 1000; i++) {
-		setInput(leftSensor, frontSensor, rightSensor, 1, angleToGoal);
+		setInput(leftSensor, frontSensor, rightSensor, distanceToGoal, angleToGoal);
 		runFuzzyProcess();
 
 		// angle and position correction
 		angleToGoal += (_rightMotorActivation - _leftMotorActivation)*speed;
 		positionX += -sin(angleToGoal)*(_rightMotorActivation + _leftMotorActivation)*speed / 2;
 		positionY += cos(angleToGoal)*(_rightMotorActivation + _leftMotorActivation)*speed / 2;
+		distanceToGoal = sqrtf(positionX*positionX + (15 - positionY)*(15 - positionY));
 
 		// sensor correction
-		if (cos(angleToGoal + 3.1415 / 8) != 0) {
+		if (cos(angleToGoal + 3.1415 / 8) <= 0) {
+			leftSensor = 1000;
+		}
+		else {
 			leftSensor = (barrierPosition - positionY) / cos(angleToGoal + 3.1415 / 8);
 		}
-		else leftSensor = 100;
-		if ( cos(angleToGoal) ){
+		if ( cos(angleToGoal) <= 0){
+			frontSensor = 1000;
+		}
+		else {
 			frontSensor = (barrierPosition - positionY) / cos(angleToGoal);
 		}
-		else frontSensor = 100;
-		if (cos(angleToGoal - 3.1415 / 8) ){
+		if (cos(angleToGoal - 3.1415 / 8) <= 0){
+			rightSensor = 1000;
+		}
+		else {
 			rightSensor = (barrierPosition - positionY) / cos(angleToGoal - 3.1415 / 8);
 		}
-		else rightSensor = 100;
 
-		// Print results on serial port
+		// Print results on serial port		
+		Serial.print("Iteration ");
+		Serial.println(counter);
+
 		Serial.print("Left ");
 		Serial.print(leftSensor);
 		Serial.print(" / Front ");
@@ -1151,11 +1243,22 @@ void SimulateWalk() {
 		Serial.print(positionX);
 		Serial.print(" / PosY ");
 		Serial.println(positionY);
+
+		Serial.print("LEFT MOTOR = ");
+		Serial.print(_leftMotorActivation * 100);
+		Serial.print("%\t");
+		Serial.print(" RIGHT MOTOR = ");
+		Serial.print(_rightMotorActivation * 100);
+		Serial.println("%");
 		Serial.println();
 
-		printData();
-
+		if (counter == 200) {
+			barrierPosition = 1000;
+		}
+		counter++;
+		if (counter > 200) {
+			delay(2000);
+		}
 		delay(1000);
 	}
 }
-
