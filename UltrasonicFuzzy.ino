@@ -23,12 +23,6 @@ using namespace std;
 
 const int NUMBER_OF_READINGS = 3;
 
-typedef struct uSensor { int dataPort; int triggerPort; double value; };
-typedef struct tSensor { int dataPort; double value; };
-typedef struct doSensor { SoftwareSerial serialPorts; double value; };
-typedef struct orpSensor { SoftwareSerial serialPorts; double value; };
-typedef struct phSensor { int dataPort; double value; };
-
 // PORT CONFIGURATION
 #define sensor1Port		1
 #define sensor1Trigger	2
@@ -39,13 +33,19 @@ typedef struct phSensor { int dataPort; double value; };
 #define thermalSensor1Port	A0
 #define thermalSensor2Port	A1
 #define phSensorPort		A2
-#define oxygenReductionReceive 10	//Possible ports: 10 to 15; 50 to 53; A8 to A15
-#define oxygenReductionTransmit 11
-#define dissolvedOxygenReceive 12	//Possible ports: 10 to 15; 50 to 53; A8 to A15
-#define dissolvedOxygenTransmit 13
+#define orpInPort	10	//Possible ports: 10 to 15; 50 to 53; A8 to A15
+#define orpOutPort	11
+#define doInPort	12	//Possible ports: 10 to 15; 50 to 53; A8 to A15
+#define doOutPort	13
 
-SoftwareSerial dissolvedOxygenSerial(dissolvedOxygenReceive, dissolvedOxygenTransmit);
-SoftwareSerial oxygenReductionSerial(oxygenReductionReceive, oxygenReductionTransmit);
+SoftwareSerial doSerial(doInPort, doOutPort);
+SoftwareSerial orpSerial(orpInPort, orpOutPort);
+
+typedef struct uSensor { int dataPort; int triggerPort; double value; };
+typedef struct tSensor { int dataPort; double value; };
+typedef struct phSensor { int dataPort; double value; };
+typedef struct doSensor { SoftwareSerial *serial; double value; };
+typedef struct orpSensor { SoftwareSerial *serial; double value; };
 
 uSensor ultrasonic1;
 uSensor ultrasonic2;
@@ -119,16 +119,20 @@ void setup()
 {
 	Serial.begin(9600);
 	Serial.println("Port open");
+
 	ultrasonicArray[0] = { sensor1Port, sensor1Trigger, 0 };
 	ultrasonicArray[1] = { sensor2Port, sensor2Trigger, 0 };
 	ultrasonicArray[2] = { sensor3Port, sensor3Trigger, 0 };
 	thermal1 = { thermalSensor1Port, 0 };
 	thermal2 = { thermalSensor2Port, 0 };
-	dissolvedOxygen = { dissolvedOxygenSerial, 0 };
-	oxygenReduction = { oxygenReductionSerial, 0 };
+	doSerial.begin(9600);
+	orpSerial.begin(9600);
+	dissolvedOxygen = { &doSerial, 0 };
+	oxygenReduction = { &orpSerial, 0 };
 	ph = { phSensorPort, 0 };
-	Serial.println("Sensors initialized");
 
+	Serial.println("Sensors initialized");
+	Serial.println("Beginning loop");
 	delay(1000);
 }
 
@@ -182,6 +186,8 @@ void loop()
 
 	//SimulateWalk();	
 
+	thermal1.value = evaluateSensor(thermal1);
+	Serial.println((double)thermal1.value);
 	delay(1000);
 }
 
@@ -210,7 +216,7 @@ double evaluateSensor(struct tSensor sensor) {
 
 	// analog pin reads 130 in 100°C and 694 in 0°C
 	// multiplication is due map only using integers
-	sensor.value = map(analogRead(sensor.dataPort), 694, 134, 0, 1000)/10.;
+	sensor.value = map(analogRead(sensor.dataPort), 694, 119, 0, 10000)/100.;
 
 	//Serial.print("Temperature = ");
 	//Serial.print(sensor.value);
@@ -221,9 +227,9 @@ double evaluateSensor(struct tSensor sensor) {
 double evaluateSensor(struct doSensor sensor){
 	String sensorString;
 	// If a Stringacter has been received
-	if (dissolvedOxygenSerial.available() > 0){
+	if (sensor.serial->available() > 0){
 		// Gets the received String
-		String inString = (String)dissolvedOxygenSerial.read();
+		String inString = (String)sensor.serial->read();
 		// Composes the String
 		sensorString += inString;
 		// Reading ends with a CR
@@ -237,9 +243,9 @@ double evaluateSensor(struct doSensor sensor){
 double evaluateSensor(struct orpSensor sensor) {
 	String sensorString;
 	// If a Stringacter has been received
-	if (oxygenReductionSerial.available() > 0){
+	if (sensor.serial->available() > 0){
 		// Gets the received String
-		String inString = (String)oxygenReductionSerial.read();
+		String inString = (String)sensor.serial->read();
 		// Composes the String
 		sensorString += inString;
 		// Reading ends with a CR
