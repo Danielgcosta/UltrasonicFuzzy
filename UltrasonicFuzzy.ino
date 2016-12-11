@@ -18,40 +18,44 @@ Karla Figueiredo	karla@ele.puc-rio.br
 */
 
 #include <String.h>
+#include <SoftwareSerial.h> // For Oxygen Reduction and dissolvedOxygen sensors which simulate serial ports
 using namespace std;
 
 const int NUMBER_OF_READINGS = 3;
 
 typedef struct uSensor { int dataPort; int triggerPort; double value; };
 typedef struct tSensor { int dataPort; double value; };
-typedef struct doSensor { int dataPort; double value; };
-typedef struct orpSensor { int dataPort; double value; };
+typedef struct doSensor { SoftwareSerial serialPorts; double value; };
+typedef struct orpSensor { SoftwareSerial serialPorts; double value; };
 typedef struct phSensor { int dataPort; double value; };
 
 // PORT CONFIGURATION
 #define sensor1Port		1
 #define sensor1Trigger	2
-int sensor2Port		= 3;
-int sensor2Trigger	= 4;
-int sensor3Port		= 5;
-int sensor3Trigger	= 6;
-int thermalAnalogPort = A0;
+#define sensor2Port		3
+#define sensor2Trigger	4
+#define sensor3Port		5
+#define sensor3Trigger	6
+#define thermalSensor1Port	A0
+#define thermalSensor2Port	A1
+#define phSensorPort		A2
+#define oxygenReductionReceive 10	//Possible ports: 10 to 15; 50 to 53; A8 to A15
+#define oxygenReductionTransmit 11
+#define dissolvedOxygenReceive 12	//Possible ports: 10 to 15; 50 to 53; A8 to A15
+#define dissolvedOxygenTransmit 13
 
+SoftwareSerial dissolvedOxygenSerial(dissolvedOxygenReceive, dissolvedOxygenTransmit);
+SoftwareSerial oxygenReductionSerial(oxygenReductionReceive, oxygenReductionTransmit);
 
 uSensor ultrasonic1;
 uSensor ultrasonic2;
 uSensor ultrasonic3;
 uSensor ultrasonicArray[3] = { ultrasonic1 , ultrasonic2, ultrasonic3 };
-tSensor thermal = { thermalAnalogPort, 0 };
-
-// For Oxygen Reduction and dissolvedOxygen sensors
-#include <SoftwareSerial.h>
-#define oxygenReductionReceive 10	//Possible ports: 10 to 15; 50 to 53; A8 to A15
-#define oxygenReductionTransmit 11
-#define dissolvedOxygenReceive 12	//Possible ports: 10 to 15; 50 to 53; A8 to A15
-#define dissolvedOxygenTransmit 13
-SoftwareSerial oxygenReductionSerial(oxygenReductionReceive, oxygenReductionTransmit);
-SoftwareSerial dissolvedOxygenSerial(dissolvedOxygenReceive, dissolvedOxygenTransmit);
+tSensor thermal1;
+tSensor thermal2;
+doSensor dissolvedOxygen;
+orpSensor oxygenReduction;
+phSensor ph;
 
 // Class variables
 // Sensor readings
@@ -111,7 +115,6 @@ float _veryPositiveRightPowerMembership = 0;
 float _leftMotorActivation = 0;
 float _rightMotorActivation = 0;
 
-
 void setup()
 {
 	Serial.begin(9600);
@@ -119,6 +122,13 @@ void setup()
 	ultrasonicArray[0] = { sensor1Port, sensor1Trigger, 0 };
 	ultrasonicArray[1] = { sensor2Port, sensor2Trigger, 0 };
 	ultrasonicArray[2] = { sensor3Port, sensor3Trigger, 0 };
+	thermal1 = { thermalSensor1Port, 0 };
+	thermal2 = { thermalSensor2Port, 0 };
+	dissolvedOxygen = { dissolvedOxygenSerial, 0 };
+	oxygenReduction = { oxygenReductionSerial, 0 };
+	ph = { phSensorPort, 0 };
+	Serial.println("Sensors initialized");
+
 	delay(1000);
 }
 
@@ -170,9 +180,7 @@ void loop()
 	printOutput();
 	delay(2000);*/
 
-	//SimulateWalk();
-
-	
+	//SimulateWalk();	
 
 	delay(1000);
 }
@@ -190,7 +198,8 @@ double evaluateSensor(struct uSensor sensor)
 	// Reading
 	// Serial.println("Reading...");
 	unsigned long pulse = pulseIn(sensor.dataPort, HIGH);
-	return pulse / 58.;
+	sensor.value = pulse / 58.;
+	return sensor.value;
 }
 
 double evaluateSensor(struct tSensor sensor) {
@@ -204,11 +213,10 @@ double evaluateSensor(struct tSensor sensor) {
 	sensor.value = map(analogRead(sensor.dataPort), 694, 134, 0, 1000)/10.;
 
 	//Serial.print("Temperature = ");
-	//Serial.print(evaluateSensor(thermal));
+	//Serial.print(sensor.value);
 	//Serial.println("C");
 	return sensor.value;
 }
-
 
 double evaluateSensor(struct doSensor sensor){
 	String sensorString;
@@ -226,7 +234,6 @@ double evaluateSensor(struct doSensor sensor){
 	return sensor.value;
 }
 
-
 double evaluateSensor(struct orpSensor sensor) {
 	String sensorString;
 	// If a Stringacter has been received
@@ -243,19 +250,28 @@ double evaluateSensor(struct orpSensor sensor) {
 	return sensor.value;
 }
 
-
 double evaluateSensor(struct phSensor sensor) {
 	double value = 0;
-	// E = E0 + RT*ln(alphaH+)/F = E0 - 2.303*R*T*pH/F
+
+	// Nernst equation
+	// E = E0 + 2.3 RT*ln(alphaH+)/F
+
 	// R = Ideal Gas Constant
+	double r = 8.314472; // J/(mol K)
 	// T = Temperature in Kelvin
+	double t = 273.15 + (thermal1.value + thermal2.value) / 2;
 	// F = Faraday constant
+	double f = 96485.33289;
+
+	// Nernst factor
+	// kT = 2.3*R*T/F
 
 	// Hence we must calibrate E0 with the neutral solution
 	const float E0 = 1; //dummy value for now, overwrite with calibration value
 						//_value = (E0-E)*F/(2.303*R*T)
 
-	//_value = 2;
+	sensor.value = (E0 - analogRead(sensor.dataPort) ) / (2.3*r*t / f);
+	return sensor.value;
 }
 
 
