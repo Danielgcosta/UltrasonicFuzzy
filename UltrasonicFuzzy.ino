@@ -212,7 +212,6 @@ double evaluateSensor(struct tSensor sensor) {
 
 double evaluateSensor(struct doSensor sensor){
 	String sensorString;
-	double value = 0;
 	// If a Stringacter has been received
 	if (dissolvedOxygenSerial.available() > 0){
 		// Gets the received String
@@ -221,17 +220,15 @@ double evaluateSensor(struct doSensor sensor){
 		sensorString += inString;
 		// Reading ends with a CR
 		if (inString == "\r") {
-			float value = sensorString.toFloat();
-			sensor.value = value;
+			sensor.value = sensorString.toDouble();
 		}
 	}
-	return value;
+	return sensor.value;
 }
 
 
 double evaluateSensor(struct orpSensor sensor) {
 	String sensorString;
-	double value = 0;
 	// If a Stringacter has been received
 	if (oxygenReductionSerial.available() > 0){
 		// Gets the received String
@@ -240,15 +237,15 @@ double evaluateSensor(struct orpSensor sensor) {
 		sensorString += inString;
 		// Reading ends with a CR
 		if (inString == "\r") {
-			value = sensorString.toFloat();
-			sensor.value = value;
+			sensor.value = sensorString.toDouble();
 		}		
 	}
-	return value;
+	return sensor.value;
 }
 
 
 double evaluateSensor(struct phSensor sensor) {
+	double value = 0;
 	// E = E0 + RT*ln(alphaH+)/F = E0 - 2.303*R*T*pH/F
 	// R = Ideal Gas Constant
 	// T = Temperature in Kelvin
