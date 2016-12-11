@@ -17,6 +17,9 @@ Marley Vellasco		marley@ele.puc-rio.br
 Karla Figueiredo	karla@ele.puc-rio.br
 */
 
+#include <String.h>
+using namespace std;
+
 const int NUMBER_OF_READINGS = 3;
 
 typedef struct uSensor { int dataPort; int triggerPort; double value; };
@@ -25,16 +28,30 @@ typedef struct doSensor { int dataPort; double value; };
 typedef struct orpSensor { int dataPort; double value; };
 typedef struct phSensor { int dataPort; double value; };
 
-int sensor1Port		= 1;
-int sensor1Trigger	= 2;
+// PORT CONFIGURATION
+#define sensor1Port		1
+#define sensor1Trigger	2
 int sensor2Port		= 3;
 int sensor2Trigger	= 4;
 int sensor3Port		= 5;
 int sensor3Trigger	= 6;
+int thermalAnalogPort = A0;
+
+
 uSensor ultrasonic1;
 uSensor ultrasonic2;
 uSensor ultrasonic3;
 uSensor ultrasonicArray[3] = { ultrasonic1 , ultrasonic2, ultrasonic3 };
+tSensor thermal = { thermalAnalogPort, 0 };
+
+// For Oxygen Reduction and dissolvedOxygen sensors
+#include <SoftwareSerial.h>
+#define oxygenReductionReceive 10	//Possible ports: 10 to 15; 50 to 53; A8 to A15
+#define oxygenReductionTransmit 11
+#define dissolvedOxygenReceive 12	//Possible ports: 10 to 15; 50 to 53; A8 to A15
+#define dissolvedOxygenTransmit 13
+SoftwareSerial oxygenReductionSerial(oxygenReductionReceive, oxygenReductionTransmit);
+SoftwareSerial dissolvedOxygenSerial(dissolvedOxygenReceive, dissolvedOxygenTransmit);
 
 // Class variables
 // Sensor readings
@@ -155,10 +172,8 @@ void loop()
 
 	//SimulateWalk();
 
-	tSensor thermal = { A0, 0 };
-	Serial.print("Temperature = ");
-	Serial.print(evaluateSensor(thermal));
-	Serial.println("C");
+	
+
 	delay(1000);
 }
 
@@ -187,29 +202,30 @@ double evaluateSensor(struct tSensor sensor) {
 	// analog pin reads 130 in 100°C and 694 in 0°C
 	// multiplication is due map only using integers
 	sensor.value = map(analogRead(sensor.dataPort), 694, 134, 0, 1000)/10.;
+
+	//Serial.print("Temperature = ");
+	//Serial.print(evaluateSensor(thermal));
+	//Serial.println("C");
 	return sensor.value;
 }
 
 
-double evaluateSensor(struct doSensor sensor) {
-	/*
+double evaluateSensor(struct doSensor sensor){
 	String sensorString;
+	double value = 0;
 	// If a Stringacter has been received
-	if (dissolvedOxygenSerial.available() > 0)
-	{
-	// Gets the received String
-	String inString = (String)dissolvedOxygenSerial.read();
-	// Composes the String
-	sensorString += inString;
-	// Reading ends with a CR
-	if (inString == '\r') {
-	_value = sensorString.toFloat();
+	if (dissolvedOxygenSerial.available() > 0){
+		// Gets the received String
+		String inString = (String)dissolvedOxygenSerial.read();
+		// Composes the String
+		sensorString += inString;
+		// Reading ends with a CR
+		if (inString == "\r") {
+			float value = sensorString.toFloat();
+			sensor.value = value;
+		}
 	}
-	}
-	*/
-
-	// DELETAR:
-	//_value = 3;
+	return value;
 }
 
 
