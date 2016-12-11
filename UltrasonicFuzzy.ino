@@ -230,24 +230,21 @@ double evaluateSensor(struct doSensor sensor){
 
 
 double evaluateSensor(struct orpSensor sensor) {
-	/*
 	String sensorString;
+	double value = 0;
 	// If a Stringacter has been received
-	if (oxygenReductionSerial.available() > 0)
-	{
-	// Gets the received String
-	String inString = (String)oxygenReductionSerial.read();
-	// Composes the String
-	sensorString += inString;
-	// Reading ends with a CR
-	if (inString == '\r') {
-	_value = sensorString.toFloat();
+	if (oxygenReductionSerial.available() > 0){
+		// Gets the received String
+		String inString = (String)oxygenReductionSerial.read();
+		// Composes the String
+		sensorString += inString;
+		// Reading ends with a CR
+		if (inString == "\r") {
+			value = sensorString.toFloat();
+			sensor.value = value;
+		}		
 	}
-	}
-	*/
-
-	// DELETAR:
-	//_value = 4;
+	return value;
 }
 
 
