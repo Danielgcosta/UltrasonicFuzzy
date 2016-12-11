@@ -1,6 +1,21 @@
-// Puc-Rio/ DEE/ LRI 
-// Daniel Guimarães Costa
-// Medusa2 2016
+/*
+Medusa 2.0	
+
+Robô inteligente flutuante de acompanhamento ambiental
+Environment monitoring smart floating robot
+
+Pontifícia Universidade Católica do Rio de Janeiro
+Departamento de Engenharia Elétrica
+
+Name:		Medusa2
+Created:	2015-2017
+Author:		Daniel Guimarães Costa
+Contact:	danielgc@ele.puc-rio.br
+
+Advisors:
+Marley Vellasco		marley@ele.puc-rio.br
+Karla Figueiredo	karla@ele.puc-rio.br
+*/
 
 const int NUMBER_OF_READINGS = 3;
 
@@ -138,7 +153,13 @@ void loop()
 	printOutput();
 	delay(2000);*/
 
-	SimulateWalk();
+	//SimulateWalk();
+
+	tSensor thermal = { A0, 0 };
+	Serial.print("Temperature = ");
+	Serial.print(evaluateSensor(thermal));
+	Serial.println("C");
+	delay(1000);
 }
 
 double evaluateSensor(struct uSensor sensor)
@@ -163,10 +184,10 @@ double evaluateSensor(struct tSensor sensor) {
 	// 2nd wire ----[DATA] 
 	//			\---[4,7K]----[5V]
 
-	// For example, if analog pin reads 250-700 when temps are 1.4C to 44.1C
-	//float x = map(analogRead(_port), 250, 700, 14, 441)/10;  
-	//_value /= 10.0;          // divide by 10; map() uses integers
-	//return value;
+	// analog pin reads 130 in 100°C and 694 in 0°C
+	// multiplication is due map only using integers
+	sensor.value = map(analogRead(sensor.dataPort), 694, 134, 0, 1000)/10.;
+	return sensor.value;
 }
 
 
