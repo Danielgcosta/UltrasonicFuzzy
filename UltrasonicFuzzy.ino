@@ -24,8 +24,8 @@ using namespace std;
 const int NUMBER_OF_READINGS = 3;
 
 // PORT CONFIGURATION
-#define sensor1Port		1
-#define sensor1Trigger	2
+#define sensor1Port		A1
+#define sensor1Trigger	A2
 #define sensor2Port		3
 #define sensor2Trigger	4
 #define sensor3Port		5
@@ -186,13 +186,17 @@ void loop()
 
 	//SimulateWalk();	
 
-	thermal1.value = evaluateSensor(thermal1);
+	/*thermal1.value = evaluateSensor(thermal1);
 	Serial.println((double)thermal1.value);
-	delay(1000);
+	delay(1000);*/
+
+	double value = evaluateSensor(ultrasonic1);
+	Serial.print("Ultrasonic sensor reading");
+	Serial.print(value);
+	Serial.println("cm");
 }
 
-double evaluateSensor(struct uSensor sensor)
-{
+double evaluateSensor(struct uSensor sensor){
 	// Trigger
 	// Serial.println("Triggering");
 	digitalWrite(sensor.triggerPort, LOW);
@@ -263,11 +267,11 @@ double evaluateSensor(struct phSensor sensor) {
 	// E = E0 + 2.3 RT*ln(alphaH+)/F
 
 	// R = Ideal Gas Constant
-	double r = 8.314472; // J/(mol K)
+	const double r = 8.314472; // J/(mol K)
 	// T = Temperature in Kelvin
 	double t = 273.15 + (thermal1.value + thermal2.value) / 2;
 	// F = Faraday constant
-	double f = 96485.33289;
+	const double f = 96485.33289;
 
 	// Nernst factor
 	// kT = 2.3*R*T/F
@@ -280,8 +284,30 @@ double evaluateSensor(struct phSensor sensor) {
 	return sensor.value;
 }
 
+void multipleUltrasonicReadings() {
+	double readings[3][NUMBER_OF_READINGS];
+	double sum[3] = { 0,0,0 };
+	for (unsigned int reading = 0; reading < NUMBER_OF_READINGS; reading++) {
+		for (unsigned int sensor = 0; sensor < 3; sensor++) {
+			readings[sensor][reading] = evaluateSensor(ultrasonicArray[sensor]);
+			sum[sensor] += readings[sensor][reading];
+		}
+	}
+	for (unsigned int sensor = 0; sensor < 3; sensor++) {
+		ultrasonicArray[sensor].value = sum[sensor] / NUMBER_OF_READINGS;
+	}
+	// Print in serial port
+	for (unsigned int sensor = 0; sensor < 3; sensor++) {
+		Serial.print("Valor do sensor ");
+		Serial.print(sensor);
+		Serial.print(" = ");
+		Serial.print(ultrasonicArray[sensor].value);
+		Serial.print("   ");
+	}
+}
 
-/* FUZZY LOGIC */
+
+/* ULTRASONIC FUZZY LOGIC */
 
 // Fuzzification
 
@@ -1234,6 +1260,7 @@ void runFuzzyProcess() {
 	LeftMotorDefuzzification();
 	RightMotorDefuzzification();
 }
+
 // Testing some positions to know how the fuzzy is working
 void SimulateWalk() {
 	float barrierPosition = 10;
