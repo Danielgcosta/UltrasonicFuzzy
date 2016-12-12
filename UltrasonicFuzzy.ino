@@ -26,17 +26,17 @@ const int NUMBER_OF_READINGS = 3;
 // PORT CONFIGURATION
 #define sensor1Port		A1
 #define sensor1Trigger	A2
-#define sensor2Port		3
-#define sensor2Trigger	4
-#define sensor3Port		5
-#define sensor3Trigger	6
-#define thermalSensor1Port	A0
-#define thermalSensor2Port	A1
-#define phSensorPort		A2
-#define orpInPort	10	//Possible ports: 10 to 15; 50 to 53; A8 to A15
-#define orpOutPort	11
-#define doInPort	12	//Possible ports: 10 to 15; 50 to 53; A8 to A15
-#define doOutPort	13
+#define sensor2Port		A3
+#define sensor2Trigger	A4
+#define sensor3Port		A5
+#define sensor3Trigger	A6
+#define thermalSensor1Port	A7
+#define thermalSensor2Port	A8
+#define phSensorPort		A9
+#define orpInPort	A10	//Possible ports: 10 to 15; 50 to 53; A8 to A15
+#define orpOutPort	A11
+#define doInPort	A12	//Possible ports: 10 to 15; 50 to 53; A8 to A15
+#define doOutPort	A13
 
 SoftwareSerial doSerial(doInPort, doOutPort);
 SoftwareSerial orpSerial(orpInPort, orpOutPort);
@@ -190,10 +190,9 @@ void loop()
 	Serial.println((double)thermal1.value);
 	delay(1000);*/
 
-	double value = evaluateSensor(ultrasonic1);
-	Serial.print("Ultrasonic sensor reading");
-	Serial.print(value);
-	Serial.println("cm");
+	multipleUltrasonicReadings();
+
+	//double value = evaluateSensor(ultrasonicArray[0]);
 }
 
 double evaluateSensor(struct uSensor sensor){
