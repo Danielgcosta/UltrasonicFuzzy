@@ -196,6 +196,7 @@ void loop()
 	Serial.println("cm");
 }
 
+// Ultrassonic sensor Acquisition
 double evaluateSensor(struct uSensor sensor){
 	// Trigger
 	// Serial.println("Triggering");
@@ -212,6 +213,7 @@ double evaluateSensor(struct uSensor sensor){
 	return sensor.value;
 }
 
+// Thermal sensor Acquisition
 double evaluateSensor(struct tSensor sensor) {
 	// Calibrate sensor
 	// 1st wire ----[GND]
@@ -228,6 +230,7 @@ double evaluateSensor(struct tSensor sensor) {
 	return sensor.value;
 }
 
+// Dissolved Oxygen sensor Acquisition
 double evaluateSensor(struct doSensor sensor){
 	String sensorString;
 	// If a Stringacter has been received
@@ -244,6 +247,7 @@ double evaluateSensor(struct doSensor sensor){
 	return sensor.value;
 }
 
+// Oxygen Reduction Potential sensor Acquisition
 double evaluateSensor(struct orpSensor sensor) {
 	String sensorString;
 	// If a Stringacter has been received
@@ -260,6 +264,7 @@ double evaluateSensor(struct orpSensor sensor) {
 	return sensor.value;
 }
 
+// pH sensor Acquisition
 double evaluateSensor(struct phSensor sensor) {
 	double value = 0;
 
@@ -280,6 +285,7 @@ double evaluateSensor(struct phSensor sensor) {
 	const float E0 = 1; //dummy value for now, overwrite with calibration value
 						//_value = (E0-E)*F/(2.303*R*T)
 
+	// Substituir por Serial // !!
 	sensor.value = (E0 - analogRead(sensor.dataPort) ) / (2.3*r*t / f);
 	return sensor.value;
 }
