@@ -820,7 +820,7 @@ void Fuzzify() {
 }
 
 // FUZZY RULES
-
+/*
 float LeftMotorVeryPositive() {
 	float maximum = 0., leftMotor[477];
 	leftMotor[0] = min(_veryNearLeftSensorMembership, min(_farFrontSensorMembership, min(_veryFarRightSensorMembership, min(_zeroAngleMembership, _nearGoalMembership))));
@@ -3460,6 +3460,213 @@ maximum = max(maximum, rightMotor[i]);
 }
 return maximum;
 }
+*/
+
+// Karla's Fuzzy.c adaptation
+float LeftMotorVeryNegative() {
+	float motorE[4];
+	float maxparc, minparc;
+	minparc = min(1/*memvetvalor[memind]*/, _veryPositiveAngleMembership);
+	motorE[0] = min(minparc, _veryFarFrontSensorMembership);	
+	motorE[1] = min(_veryNearFrontSensorMembership, _veryNearRightSensorMembership);
+	motorE[2] = min(_veryNearFrontSensorMembership, _nearRightSensorMembership);
+	motorE[3] = min(_nearFrontSensorMembership, _veryNearRightSensorMembership);
+	maxparc = 0;
+	for (unsigned int i = 0; i < 4; i++) {
+		maxparc = max(maxparc, motorE[i]);
+	}
+	return (maxparc);
+}
+
+float LeftMotorNegative() {
+	float motorE[4];
+	float maxparc, minparc;
+	minparc = min(_veryNearFrontSensorMembership, _zeroAngleMembership);
+	motorE[0] = min(minparc, _veryFarLeftSensorMembership);
+	minparc = min(_veryNearFrontSensorMembership, _zeroAngleMembership);
+	motorE[1] = min(minparc, _farLeftSensorMembership);
+	minparc = min(1/*memvetvalor[memind]*/, _veryPositiveAngleMembership);
+	motorE[2] = min(minparc, _farLeftSensorMembership);
+	motorE[3] = min(_nearFrontSensorMembership, _nearRightSensorMembership);
+	maxparc = 0;
+	for (unsigned int i = 0; i < 4; i++) {
+		maxparc = max(maxparc, motorE[i]);
+	}
+	return (maxparc);
+}
+
+
+
+float LeftMotorZero() {
+	float maxparc;
+	maxparc = _veryNearGoalMembership;
+	return (maxparc);
+}
+
+float LeftMotorPositive() {
+	float motorE[5];
+	float maxparc, minparc;
+	
+	minparc = min(_nearFrontSensorMembership, _zeroAngleMembership);
+	motorE[0] = min(minparc, _veryFarLeftSensorMembership);
+	minparc = min(_nearFrontSensorMembership, _zeroAngleMembership);
+	motorE[1] = min(minparc, _farLeftSensorMembership);
+	minparc = min(1/*memvetvalor[memind]*/, _positiveAngleMembership);
+	motorE[2] = min(minparc, _veryFarLeftSensorMembership);
+	minparc = min(1/*memvetvalor[memind]*/, _positiveAngleMembership);
+	motorE[3] = min(minparc, _farLeftSensorMembership);
+	motorE[4] = min(_nearFrontSensorMembership, _nearLeftSensorMembership);
+	
+	maxparc = 0;
+	for (unsigned int i = 0; i < 5; i++) {
+		maxparc = max(maxparc, motorE[i]);
+	}
+	return (maxparc);
+}
+
+float LeftMotorVeryPositive() {
+	float motorE[15];
+	float maxparc, minparc;
+	
+	minparc = min(_zeroAngleMembership, _veryFarFrontSensorMembership);
+	motorE[0] = min(minparc, _veryFarGoalMembership);
+	minparc = min(_zeroAngleMembership, _farFrontSensorMembership);
+	motorE[1] = min(minparc, _veryFarGoalMembership);
+	minparc = min(_zeroAngleMembership, _veryFarFrontSensorMembership);
+	motorE[2] = min(minparc, _farGoalMembership);
+	minparc = min(_zeroAngleMembership, _farFrontSensorMembership);
+	motorE[3] = min(minparc, _farGoalMembership);
+	minparc = min(_nearFrontSensorMembership, _zeroAngleMembership);
+	motorE[4] = min(minparc, _nearLeftSensorMembership);
+	minparc = min(_nearFrontSensorMembership, _zeroAngleMembership);
+	motorE[5] = min(minparc, _veryNearLeftSensorMembership);
+	minparc = min(_veryNearFrontSensorMembership, _zeroAngleMembership);
+	motorE[6] = min(minparc, _nearLeftSensorMembership);
+	minparc = min(_veryNearFrontSensorMembership, _zeroAngleMembership);
+	motorE[7] = min(minparc, _veryNearLeftSensorMembership);
+	minparc = min(1/*memvetvalor[memind]*/, _negativeAngleMembership);
+	motorE[8] = min(minparc, _veryFarRightSensorMembership);
+	minparc = min(1/*memvetvalor[memind]*/, _negativeAngleMembership);
+	motorE[9] = min(minparc, _farRightSensorMembership);
+	minparc = min(1/*memvetvalor[memind]*/, _veryNegativeAngleMembership);
+	motorE[10] = min(minparc, _veryFarRightSensorMembership);
+	minparc = min(1/*memvetvalor[memind]*/, _veryNegativeAngleMembership);
+	motorE[11] = min(minparc, _farRightSensorMembership);
+	motorE[12] = min(_veryNearFrontSensorMembership, _veryNearLeftSensorMembership);
+	motorE[13] = min(_veryNearFrontSensorMembership, _nearLeftSensorMembership);
+	motorE[14] = min(_nearFrontSensorMembership, _veryNearLeftSensorMembership);
+	
+	maxparc = 0;
+	for (unsigned int i = 0; i < 15; i++) {
+		maxparc = max(maxparc, motorE[i]);
+	}
+	return (maxparc);
+}
+
+float RightMotorVeryNegative() {
+	float motorD[5];
+	float maxparc, minparc;
+
+	minparc = min(_veryNearFrontSensorMembership, _zeroAngleMembership);
+	motorD[0] = min(minparc, _veryNearLeftSensorMembership);
+	minparc = min(1/*memvetvalor[memind]*/, _veryNegativeAngleMembership);
+	motorD[1] = min(minparc, _veryFarRightSensorMembership);
+	motorD[2] = min(_veryNearFrontSensorMembership, _veryNearLeftSensorMembership);
+	motorD[3] = min(_veryNearFrontSensorMembership, _nearLeftSensorMembership);
+	motorD[4] = min(_nearFrontSensorMembership, _veryNearLeftSensorMembership);
+
+	maxparc = 0;
+	for (unsigned int i = 0; i < 5; i++) {
+		maxparc = max(maxparc, motorD[i]);
+	}
+	return (maxparc);
+}
+
+float RightMotorNegative() {
+	float motorD[4];
+	float maxparc, minparc;
+
+	minparc = min(_veryNearFrontSensorMembership, _zeroAngleMembership);
+	motorD[0] = min(minparc, _nearLeftSensorMembership);
+	minparc = min(_nearFrontSensorMembership, _zeroAngleMembership);
+	motorD[1] = min(minparc, _veryNearLeftSensorMembership);
+	minparc = min(1/*memvetvalor[memind]*/, _veryNegativeAngleMembership);
+	motorD[2] = min(minparc, _farRightSensorMembership);
+	motorD[3] = min(_nearFrontSensorMembership, _nearLeftSensorMembership);
+
+	maxparc = 0;
+	for (unsigned int i = 0; i < 4; i++) {
+		maxparc = max(maxparc, motorD[i]);
+	}
+	return (maxparc);
+}
+
+float RightMotorZero() {
+	float maxparc;
+
+	maxparc = _veryNearGoalMembership;
+	return (maxparc);
+}
+
+float RightMotorPositive() {
+	float motorD[4];
+	float maxparc, minparc;
+
+	minparc = min(_nearFrontSensorMembership, _zeroAngleMembership);
+	motorD[0] = min(minparc, _nearLeftSensorMembership);
+	minparc = min(1/*memvetvalor[memind]*/, _negativeAngleMembership);
+	motorD[1] = min(minparc, _veryFarRightSensorMembership);
+	minparc = min(1/*memvetvalor[memind]*/, _negativeAngleMembership);
+	motorD[2] = min(minparc, _farRightSensorMembership);
+	motorD[3] = min(_nearFrontSensorMembership, _nearRightSensorMembership);
+	
+	maxparc = 0;
+	for (unsigned int i = 0; i < 4; i++)
+	{
+		maxparc = max(maxparc, motorD[i]);
+	}
+	return (maxparc);
+}
+
+float RightMotorVeryPositive() {
+	float motorD[15];
+	float maxparc, minparc;
+	
+	minparc = min(_zeroAngleMembership, _veryFarFrontSensorMembership);
+	motorD[0] = min(minparc, _veryFarGoalMembership);
+	minparc = min(_zeroAngleMembership, _farFrontSensorMembership);
+	motorD[1] = min(minparc, _veryFarGoalMembership);
+	minparc = min(_zeroAngleMembership, _veryFarFrontSensorMembership);
+	motorD[2] = min(minparc, _farGoalMembership);
+	minparc = min(_zeroAngleMembership, _farFrontSensorMembership);
+	motorD[3] = min(minparc, _farGoalMembership);
+	minparc = min(_nearFrontSensorMembership, _zeroAngleMembership);
+	motorD[4] = min(minparc, _veryFarLeftSensorMembership);
+	minparc = min(_nearFrontSensorMembership, _zeroAngleMembership);
+	motorD[5] = min(minparc, _farLeftSensorMembership);
+	minparc = min(_veryNearFrontSensorMembership, _zeroAngleMembership);
+	motorD[6] = min(minparc, _veryFarLeftSensorMembership);
+	minparc = min(_veryNearFrontSensorMembership, _zeroAngleMembership);
+	motorD[7] = min(minparc, _farLeftSensorMembership);
+	minparc = min(1/*memvetvalor[memind]*/, _positiveAngleMembership);
+	motorD[8] = min(minparc, _veryFarLeftSensorMembership);
+	minparc = min(1/*memvetvalor[memind]*/, _positiveAngleMembership);
+	motorD[9] = min(minparc, _farLeftSensorMembership);
+	minparc = min(1/*memvetvalor[memind]*/, _veryPositiveAngleMembership);
+	motorD[10] = min(minparc, _veryFarLeftSensorMembership);
+	minparc = min(1/*memvetvalor[memind]*/, _veryPositiveAngleMembership);
+	motorD[11] = min(minparc, _farLeftSensorMembership);
+	motorD[12] = min(_veryNearFrontSensorMembership, _veryNearRightSensorMembership);
+	motorD[13] = min(_veryNearFrontSensorMembership, _nearRightSensorMembership);
+	motorD[14] = min(_nearFrontSensorMembership, _veryNearRightSensorMembership);
+	
+	maxparc = 0;
+	for (unsigned int i = 0; i < 15; i++) {
+		maxparc = max(maxparc, motorD[i]);
+	}
+	return (maxparc);
+}
+
 
 void processRules() {
 	// Left Motor Power
