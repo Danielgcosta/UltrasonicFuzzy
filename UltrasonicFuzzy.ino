@@ -3615,7 +3615,7 @@ void printOutput() {
 }
 
 // Input mode for testing 
-void setInput(float leftSensor, float frontSensor, float rightSensor, float distanceToGoal, float angleToGoal) {
+void setSimInput(float leftSensor, float frontSensor, float rightSensor, float distanceToGoal, float angleToGoal) {
 	_leftSensorReading = leftSensor;
 	_frontSensorReading = frontSensor;
 	_rightSensorReading = rightSensor;
@@ -3647,7 +3647,7 @@ void SimulateWalk() {
 	float speed = 0.1;
 	int counter = 0;
 	for (unsigned int i = 0; i < 1000; i++) {
-		setInput(leftSensor, frontSensor, rightSensor, distanceToGoal, angleToGoal);
+		setSimInput(leftSensor, frontSensor, rightSensor, distanceToGoal, angleToGoal);
 		runFuzzyProcess();
 
 		// angle and position correction
